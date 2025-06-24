@@ -1,0 +1,19 @@
+.container {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+}
+ion-card {
+  width: 100%;
+  max-width: 400px;
+}
+.links {
+  text-align: center;
+  margin-top: 1em;
+}
+.links a {
+  color: var(--ion-color-primary);
+  text-decoration: none;
+}
