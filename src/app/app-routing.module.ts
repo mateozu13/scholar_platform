@@ -21,6 +21,8 @@ const routes: Routes = [
         (m) => m.ResetPasswordPageModule
       ),
   },
+
+  // ADMIN
   {
     path: 'admin',
     canActivate: [AuthGuard, RoleGuard],
@@ -78,7 +80,64 @@ const routes: Routes = [
       },
     ],
   },
-  // Puedes agregar aquí las rutas para student y teacher siguiendo el mismo patrón
+
+  // STUDENT
+  {
+    path: 'student',
+    canActivate: [AuthGuard, RoleGuard],
+    data: { expectedRole: 'estudiante' },
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        loadChildren: () =>
+          import(
+            './pages/student/student-dashboard/student-dashboard.module'
+          ).then((m) => m.StudentDashboardPageModule),
+      },
+      {
+        path: 'profile',
+        loadChildren: () =>
+          import('./pages/user/profile/profile.module').then(
+            (m) => m.ProfilePageModule
+          ),
+      },
+    ],
+  },
+
+  // TEACHER
+  {
+    path: 'teacher',
+    canActivate: [AuthGuard, RoleGuard],
+    data: { expectedRole: 'profesor' },
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        loadChildren: () =>
+          import(
+            './pages/teacher/teacher-dashboard/teacher-dashboard.module'
+          ).then((m) => m.TeacherDashboardPageModule),
+      },
+      {
+        path: 'profile',
+        loadChildren: () =>
+          import('./pages/user/profile/profile.module').then(
+            (m) => m.ProfilePageModule
+          ),
+      },
+    ],
+  },
+
+  // Ruta predeterminada
   {
     path: '**',
     redirectTo: 'login',

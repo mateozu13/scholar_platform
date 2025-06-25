@@ -3,12 +3,15 @@ export interface Course {
   titulo: string;
   descripcion: string;
   profesorId: string;
+  profesorNombre?: string; // Campo calculado
   estudiantes?: string[]; // IDs de estudiantes
+  estudiantesCount?: number; // Campo calculado
   fechaInicio?: Date;
   fechaFin?: Date;
   precio?: number;
   categoria?: string;
   nivel?: string;
   imagenUrl?: string;
-  profesorNombre?: string;
+  assignmentsCount?: number; // Campo calculado
+  completedAssignments?: number; // Campo calculado
 }

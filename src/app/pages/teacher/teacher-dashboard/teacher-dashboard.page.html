@@ -1,0 +1,189 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Dashboard de Profesor</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="navigateToProfile()">
+        <ion-icon slot="icon-only" name="person-circle-outline"></ion-icon>
+      </ion-button>
+      <ion-button (click)="logout()">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="welcome-section" *ngIf="currentUser">
+    <h3>Bienvenido, Prof. {{currentUser.nombre}}</h3>
+    <p>Panel de control para la gestión de tus cursos</p>
+  </div>
+
+  <ion-refresher slot="fixed" (ionRefresh)="loadData()">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Estadísticas rápidas -->
+  <ion-grid>
+    <ion-row>
+      <ion-col size="6" size-md="3">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <h2>{{taughtCourses.length}}</h2>
+            <p>Cursos Activos</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="6" size-md="3">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <h2>{{pendingReviews.length}}</h2>
+            <p>Revisiones Pendientes</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="6" size-md="3">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <h2>{{studentStats.totalStudents || 0}}</h2>
+            <p>Estudiantes</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <ion-col size="6" size-md="3">
+        <ion-card class="stat-card">
+          <ion-card-content>
+            <h2>{{studentStats.averageGrade || 0}}%</h2>
+            <p>Promedio General</p>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- Gráfico de estado de tareas -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Estado de Tareas</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <div class="chart-container">
+        <canvas id="statsChart"></canvas>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Revisiones pendientes -->
+  <ion-card *ngIf="pendingReviews.length > 0">
+    <ion-card-header>
+      <ion-card-title>Revisiones Pendientes</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item
+          *ngFor="let review of pendingReviews"
+          (click)="navigateToAssignment(review.id)"
+        >
+          <ion-avatar slot="start">
+            <img *ngIf="review.studentPhoto" [src]="review.studentPhoto" />
+            <div *ngIf="!review.studentPhoto" class="avatar-fallback">
+              {{review.studentName | slice:0:1}}
+            </div>
+          </ion-avatar>
+          <ion-label>
+            <h2>{{review.studentName}}</h2>
+            <p>{{review.titulo}} - {{review.courseTitle}}</p>
+            <p>
+              <ion-icon name="calendar-outline"></ion-icon>
+              Entregado: {{formatDate(review.submissionDate)}}
+            </p>
+          </ion-label>
+          <ion-badge slot="end" color="warning">Revisar</ion-badge>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Próximas fechas límite -->
+  <ion-card *ngIf="upcomingDeadlines.length > 0">
+    <ion-card-header>
+      <ion-card-title>Próximas Fechas Límite</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item
+          *ngFor="let deadline of upcomingDeadlines"
+          (click)="navigateToAssignment(deadline.id)"
+        >
+          <ion-label>
+            <h2>{{deadline.titulo}}</h2>
+            <p>{{deadline.courseTitle}}</p>
+            <p>
+              <ion-icon name="calendar-outline"></ion-icon>
+              Entrega: {{formatDate(deadline.fechaEntrega)}}
+              <ion-badge
+                [color]="getUrgencyClass(getDaysLeft(deadline.fechaEntrega))"
+              >
+                {{getDaysLeft(deadline.fechaEntrega)}}
+              </ion-badge>
+            </p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Tus cursos -->
+  <ion-card *ngIf="taughtCourses.length > 0">
+    <ion-card-header>
+      <ion-card-title>Tus Cursos</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="12" size-md="6" *ngFor="let course of taughtCourses">
+            <ion-card class="course-card" (click)="navigateToCourse(course.id)">
+              <div class="course-thumbnail">
+                <img
+                  *ngIf="course.imagenUrl"
+                  [src]="course.imagenUrl"
+                  alt="Course thumbnail"
+                />
+                <div *ngIf="!course.imagenUrl" class="thumbnail-fallback">
+                  {{course.titulo | slice:0:1}}
+                </div>
+              </div>
+              <ion-card-header>
+                <ion-card-title>{{course.titulo}}</ion-card-title>
+                <ion-card-subtitle
+                  >{{course.estudiantes?.length || 0}}
+                  estudiantes</ion-card-subtitle
+                >
+              </ion-card-header>
+              <ion-card-content>
+                <p>{{course.descripcion | slice:0:100}}...</p>
+                <div class="course-stats">
+                  <ion-badge color="primary"
+                    >{{course.assignmentsCount || 0}} tareas</ion-badge
+                  >
+                  <ion-badge color="success"
+                    >{{course.completedAssignments || 0}} completadas</ion-badge
+                  >
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Estado vacío -->
+  <div *ngIf="!isLoading && taughtCourses.length === 0" class="empty-state">
+    <ion-icon name="school-outline"></ion-icon>
+    <h3>Aún no tienes cursos asignados</h3>
+    <p>Contacta con el administrador para asignarte cursos</p>
+  </div>
+</ion-content>

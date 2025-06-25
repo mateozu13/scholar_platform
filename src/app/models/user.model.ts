@@ -9,6 +9,10 @@ export interface User {
   telefono?: string;
   bio?: string;
   createdAt: Date;
+
+  progresoGlobal?: number; // % de progreso general
+  promedioCalificaciones?: number; // Promedio de calificaciones
+  tareasCompletadas?: number; // Conteo de tareas completadas
 }
 
 export type UserRole = User['rol'];

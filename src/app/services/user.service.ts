@@ -28,7 +28,16 @@ export class UserService {
 
   // Actualizar usuario
   async updateUser(userId: string, data: Partial<User>): Promise<void> {
-    await this.db.collection(this.collection).doc(userId).update(data);
+    try {
+      await firebase
+        .firestore()
+        .collection(this.collection)
+        .doc(userId)
+        .update(data);
+    } catch (error) {
+      console.error('Error updating user:', error);
+      throw error;
+    }
   }
 
   // Obtener todos los usuarios (solo admin)

@@ -7,6 +7,13 @@ import { User } from '../../../models/user.model';
 import { Course } from '../../../models/course.model';
 import { AlertController, LoadingController } from '@ionic/angular';
 import { Chart, registerables } from 'chart.js';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
+
+type FirestoreTimestampLike = {
+  seconds: number;
+  nanoseconds: number;
+};
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -217,10 +224,40 @@ export class AdminDashboardPage implements OnInit {
     await alert.present();
   }
 
-  formatDate(date: Date | string | undefined): string {
-    if (!date) return 'No definida';
-    const d = new Date(date);
-    return d.toLocaleDateString('es-ES', {
+  formatDate(
+    date?: Date | string | firebase.firestore.Timestamp | FirestoreTimestampLike
+  ): string {
+    if (!date) {
+      return 'No definida';
+    }
+
+    let jsDate: Date;
+
+    // 1) Si es Timestamp de compat
+    if (date instanceof firebase.firestore.Timestamp) {
+      jsDate = date.toDate();
+
+      // 2) Si es el objeto literal { seconds, nanoseconds }
+    } else if (
+      typeof date === 'object' &&
+      'seconds' in date &&
+      'nanoseconds' in date
+    ) {
+      const millis = date.seconds * 1000 + Math.floor(date.nanoseconds / 1e6);
+      jsDate = new Date(millis);
+
+      // 3) Si es Date o string ISO
+    } else {
+      jsDate = new Date(date as string | Date);
+    }
+
+    // 4) Comprobar validez
+    if (isNaN(jsDate.getTime())) {
+      return 'No definida';
+    }
+
+    // 5) Formatear
+    return jsDate.toLocaleDateString('es-ES', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',

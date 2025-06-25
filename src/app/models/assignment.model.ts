@@ -6,4 +6,10 @@ export interface Assignment {
   fechaEntrega: Date;
   puntosMaximos?: number;
   adjuntos?: string[]; // URLs de archivos adjuntos
+  submissions?: string[];
+  status?: 'draft' | 'published' | 'submitted' | 'graded';
+  studentPhoto?: string;
+  studentName?: string;
+  courseTitle?: string;
+  submissionDate?: Date;
 }
