@@ -1,0 +1,73 @@
+import { Injectable } from '@angular/core';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/auth';
+import { Router } from '@angular/router';
+import { UserService } from './user.service';
+import { User } from '../models/user.model';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class AuthService {
+  private auth = firebase.auth();
+
+  constructor(private userService: UserService, private router: Router) {}
+
+  // Login con email y contraseña
+  async login(
+    email: string,
+    password: string,
+    rememberMe: boolean
+  ): Promise<User | null> {
+    try {
+      // Configurar la persistencia de autenticación
+      const persistence = rememberMe
+        ? firebase.auth.Auth.Persistence.LOCAL
+        : firebase.auth.Auth.Persistence.SESSION;
+
+      await this.auth.setPersistence(persistence);
+
+      const userCredential = await this.auth.signInWithEmailAndPassword(
+        email,
+        password
+      );
+      if (userCredential.user) {
+        return this.userService.getUserById(userCredential.user.uid);
+      }
+      return null;
+    } catch (error) {
+      console.error('Error en login:', error);
+      throw error;
+    }
+  }
+
+  // Cerrar sesión
+  async logout(): Promise<void> {
+    try {
+      await this.auth.signOut();
+      this.router.navigate(['/login']);
+    } catch (error) {
+      console.error('Error en logout:', error);
+      throw error;
+    }
+  }
+
+  // Recuperar contraseña
+  async resetPassword(email: string): Promise<void> {
+    try {
+      await this.auth.sendPasswordResetEmail(email);
+    } catch (error) {
+      console.error('Error al enviar correo de recuperación:', error);
+      throw error; // Re-lanzamos el error para manejarlo en el componente
+    }
+  }
+
+  // Obtener usuario actual
+  async getCurrentUser(): Promise<User | null> {
+    const user = this.auth.currentUser;
+    if (user) {
+      return this.userService.getUserById(user.uid);
+    }
+    return null;
+  }
+}

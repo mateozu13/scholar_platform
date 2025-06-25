@@ -1,0 +1,10 @@
+<div
+  class="avatar"
+  [class.small]="size === 'small'"
+  [class.medium]="size === 'medium'"
+  [class.large]="size === 'large'"
+>
+  <img *ngIf="photoUrl" [src]="photoUrl" alt="Avatar" />
+  <div *ngIf="!photoUrl" class="avatar-initials">{{ initials }}</div>
+  <div *ngIf="online" class="online-indicator"></div>
+</div>

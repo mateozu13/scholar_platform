@@ -1,0 +1,155 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-menu-button></ion-menu-button>
+    </ion-buttons>
+    <ion-title>Panel de Administración</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="welcome-section" *ngIf="currentUser">
+    <h3>Bienvenido, {{currentUser.nombre}}</h3>
+    <p>Panel de control administrativo</p>
+  </div>
+
+  <ion-grid>
+    <ion-row>
+      <!-- Tarjeta de Usuarios -->
+      <ion-col size="12" size-md="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Usuarios</ion-card-title>
+            <ion-card-subtitle>Total: {{totalUsers}}</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <ion-badge color="primary">{{userStats.students}}</ion-badge>
+                <p>Estudiantes</p>
+              </div>
+              <div class="stat-item">
+                <ion-badge color="danger">{{userStats.teachers}}</ion-badge>
+                <p>Profesores</p>
+              </div>
+              <div class="stat-item">
+                <ion-badge color="success">{{userStats.admins}}</ion-badge>
+                <p>Administradores</p>
+              </div>
+            </div>
+            <ion-button
+              expand="block"
+              fill="outline"
+              (click)="navigateToUserManagement()"
+            >
+              Gestionar Usuarios
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <!-- Tarjeta de Cursos -->
+      <ion-col size="12" size-md="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Cursos</ion-card-title>
+            <ion-card-subtitle>Total: {{totalCourses}}</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="stats-grid">
+              <div class="stat-item">
+                <ion-badge color="success">{{courseStats.active}}</ion-badge>
+                <p>Activos</p>
+              </div>
+              <div class="stat-item">
+                <ion-badge color="medium">{{courseStats.completed}}</ion-badge>
+                <p>Completados</p>
+              </div>
+            </div>
+            <ion-button
+              expand="block"
+              fill="outline"
+              (click)="navigateToCourseManagement()"
+            >
+              Gestionar Cursos
+            </ion-button>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <!-- Gráfico -->
+    <ion-row>
+      <ion-col size="12">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Estadísticas</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="chart-container">
+              <canvas id="statsChart"></canvas>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+
+    <!-- Usuarios Recientes -->
+    <ion-row>
+      <ion-col size="12" size-md="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Usuarios Recientes</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list>
+              <ion-item *ngFor="let user of recentUsers">
+                <ion-avatar slot="start">
+                  <img *ngIf="user.fotoPerfil" [src]="user.fotoPerfil" />
+                  <div *ngIf="!user.fotoPerfil" class="avatar-fallback">
+                    {{user.nombre | slice:0:1}}
+                  </div>
+                </ion-avatar>
+                <ion-label>
+                  <h2>{{user.nombre}}</h2>
+                  <p>{{user.email}}</p>
+                  <!-- <ion-badge [color]="getRoleColor(user.rol)"
+                    >{{user.rol}}</ion-badge
+                  >
+                  // TODO: arreglar este color del badge, y mejorar la pantalla de lista de usuarios!
+                  -->
+                  <ion-badge>{{user.rol | titlecase}}</ion-badge>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+
+      <!-- Cursos Recientes -->
+      <ion-col size="12" size-md="6">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Cursos Recientes</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <ion-list>
+              <ion-item *ngFor="let course of recentCourses">
+                <ion-label>
+                  <h2>{{course.titulo}}</h2>
+                  <p>{{course.descripcion | slice:0:50}}...</p>
+                  <p>Fecha fin: {{formatDate(course.fechaFin)}}</p>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

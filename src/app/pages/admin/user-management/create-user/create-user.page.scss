@@ -1,0 +1,19 @@
+ion-note[color="danger"] {
+  display: block;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  font-size: 0.8rem;
+}
+
+ion-note {
+  display: block;
+  margin-bottom: 20px;
+  color: var(--ion-color-medium);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+form {
+  max-width: 600px;
+  margin: 0 auto;
+}

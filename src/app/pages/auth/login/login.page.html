@@ -1,43 +1,57 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-title>Login</ion-title>
+  <ion-toolbar color="primary">
+    <ion-title>Iniciar Sesión</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="container">
-  <ion-card>
-    <ion-card-content>
-      <form (ngSubmit)="login()" #form="ngForm">
-        <ion-list>
-          <ion-item>
-            <ion-label position="floating">Correo</ion-label>
-            <ion-input
-              type="email"
-              [(ngModel)]="email"
-              name="email"
-              required
-            ></ion-input>
-          </ion-item>
-          <ion-item>
-            <ion-label position="floating">Contraseña</ion-label>
-            <ion-input
-              type="password"
-              [(ngModel)]="password"
-              name="password"
-              required
-            ></ion-input>
-          </ion-item>
-        </ion-list>
-        <ion-text color="danger" *ngIf="errorMsg">{{ errorMsg }}</ion-text>
-        <ion-button expand="block" type="submit">Ingresar</ion-button>
-      </form>
-      <div class="links">
-        <a [routerLink]="'/auth/forgot-password'">Olvidé mi contraseña</a><br />
-        <a [routerLink]="'/auth/register-student'"
-          >Registrarme como Estudiante</a
-        ><br />
-        <a [routerLink]="'/auth/register-teacher'">Registrarme como Profesor</a>
-      </div>
-    </ion-card-content>
-  </ion-card>
+<ion-content class="ion-padding">
+  <div class="logo-container">
+    <img src="assets/logo.png" alt="Plataforma Educativa" />
+  </div>
+
+  <form *ngIf="loginForm" [formGroup]="loginForm" (ngSubmit)="login()">
+    <ion-item>
+      <ion-label position="floating">Correo Electrónico</ion-label>
+      <ion-input formControlName="email" type="email"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Contraseña</ion-label>
+      <ion-input
+        formControlName="password"
+        [type]="showPassword ? 'text' : 'password'"
+      ></ion-input>
+      <ion-button
+        slot="end"
+        fill="clear"
+        (click)="showPassword = !showPassword"
+      >
+        <ion-icon
+          [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"
+        ></ion-icon>
+      </ion-button>
+    </ion-item>
+
+    <ion-item lines="none">
+      <ion-checkbox slot="start" formControlName="rememberMe"></ion-checkbox>
+      <ion-label>Recordarme</ion-label>
+    </ion-item>
+
+    <ion-button
+      expand="block"
+      type="submit"
+      [disabled]="!loginForm.valid"
+      class="ion-margin-top"
+    >
+      Iniciar Sesión
+    </ion-button>
+  </form>
+
+  <div class="ion-text-center ion-margin-top">
+    <a (click)="navigateToResetPassword()" class="forgot-password">
+      ¿Olvidaste tu contraseña?
+    </a>
+  </div>
+
+  <ion-toggle [(ngModel)]="isDarkMode" (ionChange)="toggleTheme()"></ion-toggle>
 </ion-content>

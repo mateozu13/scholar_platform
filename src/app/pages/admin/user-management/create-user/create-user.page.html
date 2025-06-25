@@ -1,0 +1,72 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button
+        defaultHref="/admin/user-management/list"
+      ></ion-back-button>
+    </ion-buttons>
+    <ion-title>Crear Nuevo Usuario</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="userForm" (ngSubmit)="createUser()">
+    <ion-item>
+      <ion-label position="floating">Nombre Completo</ion-label>
+      <ion-input formControlName="nombre" type="text" required></ion-input>
+    </ion-item>
+    <ion-note
+      color="danger"
+      *ngIf="userForm.get('nombre')?.invalid && userForm.get('nombre')?.touched"
+    >
+      Nombre es requerido
+    </ion-note>
+
+    <ion-item>
+      <ion-label position="floating">Correo Electrónico</ion-label>
+      <ion-input formControlName="email" type="email" required></ion-input>
+    </ion-item>
+    <ion-note
+      color="danger"
+      *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched"
+    >
+      Ingrese un correo válido
+    </ion-note>
+
+    <ion-item>
+      <ion-label position="floating">Rol</ion-label>
+      <ion-select formControlName="rol" interface="action-sheet" required>
+        <ion-select-option value="estudiante">Estudiante</ion-select-option>
+        <ion-select-option value="profesor">Profesor</ion-select-option>
+        <ion-select-option value="admin">Administrador</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-note
+      color="danger"
+      *ngIf="userForm.get('rol')?.invalid && userForm.get('rol')?.touched"
+    >
+      Rol es requerido
+    </ion-note>
+
+    <ion-item>
+      <ion-label position="floating">Teléfono (Opcional)</ion-label>
+      <ion-input formControlName="telefono" type="tel"></ion-input>
+    </ion-item>
+
+    <ion-note class="ion-margin-top">
+      <p>
+        Se asignará automáticamente la contraseña: <strong>12345678</strong>
+      </p>
+      <p>El usuario recibirá un correo para verificar su cuenta.</p>
+    </ion-note>
+
+    <ion-button
+      expand="block"
+      type="submit"
+      [disabled]="userForm.invalid"
+      class="ion-margin-top"
+    >
+      Crear Usuario
+    </ion-button>
+  </form>
+</ion-content>
