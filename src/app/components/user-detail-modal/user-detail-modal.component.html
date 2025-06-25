@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Detalles del Usuario</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="user-header">
+    <ion-avatar>
+      <img *ngIf="user.fotoPerfil" [src]="user.fotoPerfil" />
+      <div *ngIf="!user.fotoPerfil" class="avatar-fallback">
+        {{ user.nombre | slice : 0 : 1 | uppercase }}
+      </div>
+    </ion-avatar>
+    <h2>{{ user.nombre }}</h2>
+    <ion-badge [color]="getRoleColor(user.rol)">
+      {{ user.rol | titlecase }}
+    </ion-badge>
+  </div>
+
+  <ion-list>
+    <ion-item>
+      <ion-icon slot="start" name="mail-outline"></ion-icon>
+      <ion-label>
+        <h3>Correo Electrónico</h3>
+        <p>{{ user.email }}</p>
+      </ion-label>
+    </ion-item>
+
+    <ion-item *ngIf="user.telefono">
+      <ion-icon slot="start" name="call-outline"></ion-icon>
+      <ion-label>
+        <h3>Teléfono</h3>
+        <p>{{ user.telefono }}</p>
+      </ion-label>
+    </ion-item>
+
+    <ion-item>
+      <ion-icon slot="start" name="calendar-outline"></ion-icon>
+      <ion-label>
+        <h3>Fecha de Registro</h3>
+        <p>{{ formatDate(user.createdAt) }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

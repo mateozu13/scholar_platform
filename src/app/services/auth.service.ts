@@ -70,4 +70,28 @@ export class AuthService {
     }
     return null;
   }
+
+  // Cambiar contraseña
+  async changePassword(
+    currentPassword: string,
+    newPassword: string
+  ): Promise<void> {
+    try {
+      const user = firebase.auth().currentUser;
+      if (!user) throw new Error('Usuario no autenticado');
+
+      // Reautenticar al usuario
+      const credentials = firebase.auth.EmailAuthProvider.credential(
+        user.email!,
+        currentPassword
+      );
+      await user.reauthenticateWithCredential(credentials);
+
+      // Cambiar la contraseña
+      await user.updatePassword(newPassword);
+    } catch (error) {
+      console.error('Error al cambiar contraseña:', error);
+      throw error;
+    }
+  }
 }

@@ -39,6 +39,13 @@ const routes: Routes = [
           ),
       },
       {
+        path: 'profile',
+        loadChildren: () =>
+          import('./pages/user/profile/profile.module').then(
+            (m) => m.ProfilePageModule
+          ),
+      },
+      {
         path: 'user-management',
         children: [
           {

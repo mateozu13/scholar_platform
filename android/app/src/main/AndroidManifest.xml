@@ -37,5 +37,43 @@
 
     <!-- Permissions -->
 
-    <uses-permission android:name="android.permission.INTERNET" />
+   <!-- Acceso a Internet -->
+<uses-permission android:name="android.permission.INTERNET" />
+
+<!-- Estado de red (útil para detectar conexión) -->
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+<!-- WIFI (si consultas información de Wi-Fi) -->
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+
+<!-- Almacenamiento externo (lectura/escritura) – necesario para plugins de Filesystem -->
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    android:maxSdkVersion="28" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+<!-- Cámara (si usas el plugin Camera o Barcode Scanner) -->
+<uses-permission android:name="android.permission.CAMERA" />
+
+<!-- Micrófono (si grabas audio o vídeo con cámara) -->
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+<!-- Ubicación (si usas Geolocation) -->
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+<!-- Vibración (para notificaciones locales) -->
+<uses-permission android:name="android.permission.VIBRATE" />
+
+<!-- Notificaciones en Android 13+ -->
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+<!-- Recepción de mensajes push (Firebase Cloud Messaging) -->
+<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+
+<!-- Mantener dispositivo despierto para notificaciones push -->
+<uses-permission android:name="android.permission.WAKE_LOCK" />
+
+<!-- Arranque al iniciar (opcional si rehílices lógica tras reboot) -->
+<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
 </manifest>

@@ -6,7 +6,7 @@
 
 <ion-content class="ion-padding">
   <div class="logo-container">
-    <img src="assets/logo.png" alt="Plataforma Educativa" />
+    <img style="width: 45%" src="assets/icon.png" alt="Plataforma Educativa" />
   </div>
 
   <form *ngIf="loginForm" [formGroup]="loginForm" (ngSubmit)="login()">
@@ -52,6 +52,4 @@
       ¿Olvidaste tu contraseña?
     </a>
   </div>
-
-  <ion-toggle [(ngModel)]="isDarkMode" (ionChange)="toggleTheme()"></ion-toggle>
 </ion-content>

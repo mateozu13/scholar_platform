@@ -16,8 +16,6 @@ export class LoginPage implements OnInit {
   showPassword = false;
   showResetPasswordCard = false;
 
-  isDarkMode: boolean = false;
-
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
@@ -28,8 +26,6 @@ export class LoginPage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    this.loadThemePreference();
-
     const rememberedEmail = await this.preferences.getRememberedEmail();
 
     this.loginForm = this.fb.group({
@@ -112,26 +108,5 @@ export class LoginPage implements OnInit {
     await this.router.navigate(['/reset-password'], {
       state: { email: this.loginForm.value.email },
     });
-  }
-
-  toggleTheme() {
-    // Alternar el modo
-    this.isDarkMode = !this.isDarkMode;
-    document.body.classList.toggle('dark', this.isDarkMode);
-    // Guardar preferencia en localStorage
-    localStorage.setItem('theme', this.isDarkMode ? 'dark' : 'light');
-  }
-
-  private loadThemePreference() {
-    // Cargar preferencia de tema desde localStorage
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      this.isDarkMode = true;
-      document.body.classList.add('dark');
-    } else {
-      // Modo claro por defecto
-      this.isDarkMode = false;
-      document.body.classList.remove('dark');
-    }
   }
 }

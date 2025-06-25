@@ -1,6 +1,6 @@
 ion-avatar {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
 
   .avatar-fallback {
     display: flex;
@@ -12,5 +12,75 @@ ion-avatar {
     color: white;
     border-radius: 50%;
     font-weight: bold;
+    font-size: 1.2rem;
+  }
+}
+
+ion-badge {
+  margin-top: 5px;
+  margin-right: 5px;
+}
+
+ion-item {
+  --padding-start: 10px;
+  --padding-end: 10px;
+  --min-height: 72px;
+
+  ion-label {
+    margin-top: 8px;
+    margin-bottom: 8px;
+
+    h2 {
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    p {
+      color: var(--ion-color-medium);
+      margin-top: 3px;
+      margin-bottom: 3px;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding-top: 30%;
+
+  ion-icon {
+    font-size: 4rem;
+    color: var(--ion-color-medium);
+    margin-bottom: 20px;
+  }
+
+  h3 {
+    color: var(--ion-color-medium);
+    font-weight: 500;
+  }
+
+  p {
+    color: var(--ion-color-medium-shade);
+  }
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  padding: 20px;
+
+  ion-spinner {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+.auto-height-modal {
+  --height: auto;
+  --max-height: 80vh;
+
+  .ion-page {
+    position: relative;
+    contain: content;
   }
 }

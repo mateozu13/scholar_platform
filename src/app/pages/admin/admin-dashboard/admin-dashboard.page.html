@@ -5,6 +5,9 @@
     </ion-buttons>
     <ion-title>Panel de Administración</ion-title>
     <ion-buttons slot="end">
+      <ion-button (click)="navigateToProfile()">
+        <ion-icon slot="icon-only" name="person-circle-outline"></ion-icon>
+      </ion-button>
       <ion-button (click)="logout()">
         <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
       </ion-button>
@@ -34,7 +37,7 @@
                 <p>Estudiantes</p>
               </div>
               <div class="stat-item">
-                <ion-badge color="danger">{{userStats.teachers}}</ion-badge>
+                <ion-badge color="warning">{{userStats.teachers}}</ion-badge>
                 <p>Profesores</p>
               </div>
               <div class="stat-item">
@@ -53,30 +56,39 @@
         </ion-card>
       </ion-col>
 
-      <!-- Tarjeta de Cursos -->
+      <!-- Tarjeta de Estadísticas de Plataforma -->
       <ion-col size="12" size-md="6">
         <ion-card>
           <ion-card-header>
-            <ion-card-title>Cursos</ion-card-title>
-            <ion-card-subtitle>Total: {{totalCourses}}</ion-card-subtitle>
+            <ion-card-title>Actividad Reciente</ion-card-title>
           </ion-card-header>
           <ion-card-content>
             <div class="stats-grid">
               <div class="stat-item">
-                <ion-badge color="success">{{courseStats.active}}</ion-badge>
-                <p>Activos</p>
+                <ion-badge color="tertiary"
+                  >{{platformStats.activeCourses}}</ion-badge
+                >
+                <p>Cursos Activos</p>
               </div>
               <div class="stat-item">
-                <ion-badge color="medium">{{courseStats.completed}}</ion-badge>
-                <p>Completados</p>
+                <ion-badge color="danger"
+                  >{{platformStats.pendingTasks}}</ion-badge
+                >
+                <p>Tareas Pendientes</p>
+              </div>
+              <div class="stat-item">
+                <ion-badge color="medium"
+                  >{{platformStats.unreadMessages}}</ion-badge
+                >
+                <p>Mensajes No Leídos</p>
               </div>
             </div>
             <ion-button
               expand="block"
               fill="outline"
-              (click)="navigateToCourseManagement()"
+              (click)="navigateToPlatformStats()"
             >
-              Gestionar Cursos
+              Ver Estadísticas
             </ion-button>
           </ion-card-content>
         </ion-card>
@@ -88,7 +100,7 @@
       <ion-col size="12">
         <ion-card>
           <ion-card-header>
-            <ion-card-title>Estadísticas</ion-card-title>
+            <ion-card-title>Distribución de Usuarios</ion-card-title>
           </ion-card-header>
           <ion-card-content>
             <div class="chart-container">
@@ -107,46 +119,65 @@
             <ion-card-title>Usuarios Recientes</ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            <ion-list>
-              <ion-item *ngFor="let user of recentUsers">
+            <ion-list lines="none">
+              <ion-item
+                *ngFor="let user of recentUsers"
+                (click)="viewUserDetails(user.id)"
+              >
                 <ion-avatar slot="start">
                   <img *ngIf="user.fotoPerfil" [src]="user.fotoPerfil" />
                   <div *ngIf="!user.fotoPerfil" class="avatar-fallback">
-                    {{user.nombre | slice:0:1}}
+                    {{user.nombre | slice:0:1 | uppercase}}
                   </div>
                 </ion-avatar>
                 <ion-label>
                   <h2>{{user.nombre}}</h2>
                   <p>{{user.email}}</p>
-                  <!-- <ion-badge [color]="getRoleColor(user.rol)"
-                    >{{user.rol}}</ion-badge
+                  <ion-badge [color]="getRoleColor(user.rol)"
+                    >{{getRoleLabel(user.rol)}}</ion-badge
                   >
-                  // TODO: arreglar este color del badge, y mejorar la pantalla de lista de usuarios!
-                  -->
-                  <ion-badge>{{user.rol | titlecase}}</ion-badge>
                 </ion-label>
               </ion-item>
             </ion-list>
+            <ion-button
+              expand="block"
+              fill="clear"
+              (click)="navigateToUserManagement()"
+            >
+              Ver todos los usuarios
+            </ion-button>
           </ion-card-content>
         </ion-card>
       </ion-col>
 
-      <!-- Cursos Recientes -->
+      <!-- Cursos Destacados -->
       <ion-col size="12" size-md="6">
         <ion-card>
           <ion-card-header>
-            <ion-card-title>Cursos Recientes</ion-card-title>
+            <ion-card-title>Cursos Destacados</ion-card-title>
           </ion-card-header>
           <ion-card-content>
-            <ion-list>
-              <ion-item *ngFor="let course of recentCourses">
+            <ion-list lines="none">
+              <ion-item
+                *ngFor="let course of featuredCourses"
+                (click)="viewCourseDetails(course.id)"
+              >
+                <ion-thumbnail slot="start">
+                  <img *ngIf="course.imagenUrl" [src]="course.imagenUrl" />
+                  <div *ngIf="!course.imagenUrl" class="course-thumbnail">
+                    {{course.titulo | slice:0:1}}
+                  </div>
+                </ion-thumbnail>
                 <ion-label>
                   <h2>{{course.titulo}}</h2>
-                  <p>{{course.descripcion | slice:0:50}}...</p>
-                  <p>Fecha fin: {{formatDate(course.fechaFin)}}</p>
+                  <p>Profesor: {{course.profesorNombre}}</p>
+                  <p>Estudiantes: {{course.estudiantes?.length || 0}}</p>
                 </ion-label>
               </ion-item>
             </ion-list>
+            <ion-button expand="block" fill="clear" routerLink="/admin/courses">
+              Ver todos los cursos
+            </ion-button>
           </ion-card-content>
         </ion-card>
       </ion-col>

@@ -14,10 +14,12 @@ import { AngularFireStorageModule } from '@angular/fire/compat/storage';
 import { environment } from '../environments/environment';
 import { AvatarComponent } from './components/avatar/avatar.component';
 import { Chart, registerables } from 'chart.js';
+import { UserDetailModalComponent } from './components/user-detail-modal/user-detail-modal.component';
+import { Camera } from '@capacitor/camera';
 
 Chart.register(...registerables);
 @NgModule({
-  declarations: [AppComponent, AvatarComponent],
+  declarations: [AppComponent, AvatarComponent, UserDetailModalComponent],
   imports: [
     BrowserModule,
     // Inicializar Firebase

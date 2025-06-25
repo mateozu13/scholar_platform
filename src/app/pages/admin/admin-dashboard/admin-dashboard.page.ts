@@ -19,9 +19,9 @@ export class AdminDashboardPage implements OnInit {
   totalUsers: number = 0;
   totalCourses: number = 0;
   recentUsers: User[] = [];
-  recentCourses: Course[] = [];
+  featuredCourses: Course[] = [];
   userStats: any = {};
-  courseStats: any = {};
+  platformStats: any = {};
   statsChart: any;
 
   constructor(
@@ -56,7 +56,15 @@ export class AdminDashboardPage implements OnInit {
       // Obtener estadísticas de usuarios
       const allUsers = await this.userService.getAllUsers();
       this.totalUsers = allUsers.length;
-      this.recentUsers = allUsers.slice(0, 5);
+
+      // Ordenar usuarios por fecha de creación (más recientes primero)
+      this.recentUsers = [...allUsers]
+        .sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )
+        .slice(0, 5);
+
       this.userStats = {
         students: allUsers.filter((u) => u.rol === 'estudiante').length,
         teachers: allUsers.filter((u) => u.rol === 'profesor').length,
@@ -66,13 +74,27 @@ export class AdminDashboardPage implements OnInit {
       // Obtener estadísticas de cursos
       const allCourses = await this.courseService.getAllCourses();
       this.totalCourses = allCourses.length;
-      this.recentCourses = allCourses.slice(0, 5);
-      this.courseStats = {
-        active: allCourses.filter((c) => new Date(c.fechaFin || 0) > new Date())
-          .length,
-        completed: allCourses.filter(
-          (c) => new Date(c.fechaFin || 0) <= new Date()
+
+      // Obtener nombres de profesores para los cursos destacados
+      const featuredCoursesWithTeachers = await Promise.all(
+        allCourses.slice(0, 3).map(async (course) => {
+          const teacher = await this.userService.getUserById(course.profesorId);
+          return {
+            ...course,
+            profesorNombre: teacher?.nombre || 'Desconocido',
+          };
+        })
+      );
+
+      this.featuredCourses = featuredCoursesWithTeachers;
+
+      // Estadísticas de plataforma (simuladas)
+      this.platformStats = {
+        activeCourses: allCourses.filter(
+          (c) => new Date(c.fechaFin || 0) > new Date()
         ).length,
+        pendingTasks: 24, // Valor simulado
+        unreadMessages: 8, // Valor simulado
       };
 
       // Crear gráficos
@@ -109,12 +131,12 @@ export class AdminDashboardPage implements OnInit {
             ],
             backgroundColor: [
               'rgba(54, 162, 235, 0.7)',
-              'rgba(255, 99, 132, 0.7)',
+              'rgba(255, 159, 64, 0.7)',
               'rgba(75, 192, 192, 0.7)',
             ],
             borderColor: [
               'rgba(54, 162, 235, 1)',
-              'rgba(255, 99, 132, 1)',
+              'rgba(255, 159, 64, 1)',
               'rgba(75, 192, 192, 1)',
             ],
             borderWidth: 1,
@@ -130,6 +152,23 @@ export class AdminDashboardPage implements OnInit {
           title: {
             display: true,
             text: 'Distribución de Usuarios',
+            font: {
+              size: 16,
+            },
+          },
+          tooltip: {
+            callbacks: {
+              label: function (context) {
+                const label = context.label || '';
+                const value = context.raw || 0;
+                const total = context.dataset.data.reduce(
+                  (a: number, b: number) => a + b,
+                  0
+                );
+                const percentage = Math.round((+value / total) * 100);
+                return `${label}: ${value} (${percentage}%)`;
+              },
+            },
           },
         },
       },
@@ -140,9 +179,22 @@ export class AdminDashboardPage implements OnInit {
     this.router.navigate(['/admin/user-management/list']);
   }
 
-  navigateToCourseManagement() {
+  navigateToProfile() {
+    this.router.navigate(['/admin/profile']);
+  }
+
+  navigateToPlatformStats() {
     // Implementar según necesidad
-    console.log('Navegar a gestión de cursos');
+    console.log('Navegar a estadísticas de plataforma');
+  }
+
+  viewUserDetails(userId: string) {
+    this.router.navigate(['/admin/user-management/edit', userId]);
+  }
+
+  viewCourseDetails(courseId: string) {
+    // Implementar según necesidad
+    console.log('Ver detalles del curso', courseId);
   }
 
   async logout() {
@@ -173,5 +225,31 @@ export class AdminDashboardPage implements OnInit {
       month: 'short',
       day: 'numeric',
     });
+  }
+
+  getRoleColor(role: string): string {
+    switch (role) {
+      case 'admin':
+        return 'success';
+      case 'profesor':
+        return 'warning';
+      case 'estudiante':
+        return 'primary';
+      default:
+        return 'medium';
+    }
+  }
+
+  getRoleLabel(role: string): string {
+    switch (role) {
+      case 'admin':
+        return 'Administrador';
+      case 'profesor':
+        return 'Profesor';
+      case 'estudiante':
+        return 'Estudiante';
+      default:
+        return role;
+    }
   }
 }

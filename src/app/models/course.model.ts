@@ -10,4 +10,5 @@ export interface Course {
   categoria?: string;
   nivel?: string;
   imagenUrl?: string;
+  profesorNombre?: string;
 }
