@@ -1,0 +1,14 @@
+modificar SQL
+
+-- Formato de binlog a ROW
+SET GLOBAL binlog_format = 'ROW';
+
+-- Incluir siempre todos los valores de columna
+SET GLOBAL binlog_row_image = 'FULL';
+
+-- Metadata completa (necesaria para réplica y parsing de columnas)
+SET GLOBAL binlog_row_metadata = 'FULL';
+
+SHOW GLOBAL VARIABLES LIKE 'binlog_format';
+SHOW GLOBAL VARIABLES LIKE 'binlog_row_image';
+SHOW GLOBAL VARIABLES LIKE 'binlog_row_metadata';

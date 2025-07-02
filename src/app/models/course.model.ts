@@ -1,6 +1,6 @@
 export interface Course {
   id: string;
-  name: string;
+  titulo: string;
   descripcion: string;
   profesorId: string;
   profesorNombre?: string; // Campo calculado
