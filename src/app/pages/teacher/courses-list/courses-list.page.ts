@@ -23,7 +23,9 @@ export class CoursesListPage implements OnInit {
 
   constructor(private router: Router, private firestore: Firestore) {
     const coursesCollection = collection(this.firestore, 'courses');
-    this.courses$ = collectionData(coursesCollection, { idField: 'id' }) as Observable<Course[]>;
+    this.courses$ = collectionData(coursesCollection, {
+      idField: 'id',
+    }) as Observable<Course[]>;
   }
 
   ngOnInit() {

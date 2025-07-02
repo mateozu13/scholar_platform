@@ -67,6 +67,7 @@ export class CreateUserPage implements OnInit {
         rol: formValues.rol,
         telefono: formValues.telefono || '',
         createdAt: new Date(),
+        active: true,
         // Puedes añadir más campos según tu modelo
       };
 
