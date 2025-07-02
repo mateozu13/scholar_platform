@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Detalle de Tarea</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/teacher/dashboard"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="!isLoading; else loading">
+  <ion-card *ngIf="tarea; else noTarea">
+    <ion-card-header>
+      <ion-card-title>{{ tarea.titulo }}</ion-card-title>
+      <ion-card-subtitle>
+        Fecha de entrega: {{ tarea.fechaEntrega?.getDate()| date: 'mediumDate' }}
+      </ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p><strong>Descripción:</strong></p>
+      <p>{{ tarea.descripcion || 'No especificada' }}</p>
+
+      <ion-button expand="block" color="danger" (click)="eliminarTarea()">
+        Eliminar Tarea
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
+
+<ng-template #loading>
+  <ion-spinner name="crescent" class="ion-margin"></ion-spinner>
+</ng-template>
+
+<ng-template #noTarea>
+  <ion-text color="medium">
+    <p class="ion-padding">No se encontró la tarea.</p>
+  </ion-text>
+</ng-template>

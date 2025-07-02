@@ -1,0 +1,93 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/teacher/course-detail/{{ courseId }}"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Crear Quiz</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <ion-item>
+    <ion-label position="floating">Título del Quiz</ion-label>
+    <ion-input [(ngModel)]="titulo"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Descripción del Quiz</ion-label>
+    <ion-textarea [(ngModel)]="descripcion"></ion-textarea>
+  </ion-item>
+
+  <div *ngFor="let pregunta of preguntas; let i = index" class="ion-margin-top">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Pregunta {{ i + 1 }}</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+
+        <ion-item>
+          <ion-label position="floating">Texto de la pregunta</ion-label>
+          <ion-input [(ngModel)]="pregunta.texto"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Tipo de pregunta</ion-label>
+          <ion-select [(ngModel)]="pregunta.tipo">
+            <ion-select-option value="opcion_multiple">Opción múltiple</ion-select-option>
+            <ion-select-option value="verdadero_falso">Verdadero o falso</ion-select-option>
+            <ion-select-option value="respuesta_corta">Respuesta corta</ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <div *ngIf="pregunta.tipo === 'opcion_multiple'">
+          <div *ngFor="let opcion of pregunta.opciones; let j = index">
+            <ion-item>
+              <ion-label position="floating">Opción {{ j + 1 }}</ion-label>
+              <ion-input [(ngModel)]="pregunta.opciones[j]"></ion-input>
+            </ion-item>
+          </div>
+
+          <ion-item>
+            <ion-label>Respuesta correcta</ion-label>
+            <ion-select [(ngModel)]="pregunta.respuestaCorrecta">
+              <ion-select-option *ngFor="let opcion of pregunta.opciones; let k = index" [value]="k">
+                Opción {{ k + 1 }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
+
+        <div *ngIf="pregunta.tipo === 'verdadero_falso'">
+          <ion-item>
+            <ion-label>Respuesta correcta</ion-label>
+            <ion-select [(ngModel)]="pregunta.respuestaCorrecta">
+              <ion-select-option [value]="true">Verdadero</ion-select-option>
+              <ion-select-option [value]="false">Falso</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
+
+        <div *ngIf="pregunta.tipo === 'respuesta_corta'">
+          <ion-item>
+            <ion-label position="floating">Respuesta correcta</ion-label>
+            <ion-input [(ngModel)]="pregunta.respuestaCorrecta"></ion-input>
+          </ion-item>
+        </div>
+
+        <ion-item>
+          <ion-label position="floating">Puntaje</ion-label>
+          <ion-input type="number" [(ngModel)]="pregunta.puntaje"></ion-input>
+        </ion-item>
+
+        <ion-button color="danger" fill="clear" (click)="eliminarPregunta(i)">
+          Eliminar pregunta
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <ion-button expand="block" fill="outline" (click)="agregarPregunta()">+ Agregar Pregunta</ion-button>
+  <ion-button expand="block" class="ion-margin-top" (click)="guardarQuiz()">Guardar Quiz</ion-button>
+
+</ion-content>

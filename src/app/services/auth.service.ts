@@ -71,6 +71,12 @@ export class AuthService {
     return null;
   }
 
+  // Obtener solo el UID del usuario autenticado
+async getCurrentUserId(): Promise<string> {
+  const user = this.auth.currentUser;
+  return user?.uid || '';
+}
+
   // Cambiar contraseña
   async changePassword(
     currentPassword: string,

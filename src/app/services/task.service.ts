@@ -82,6 +82,17 @@ export class TaskService {
     }));
   }
 
+  
+async deleteAssignment(assignmentId: string): Promise<void> {
+  try {
+    await this.assignmentsRef.doc(assignmentId).delete();
+  } catch (error) {
+    console.error('Error al eliminar la tarea:', error);
+    throw error;
+  }
+}
+
+
   /** Calificar una entrega (profesor) */
   gradeSubmission(
     submissionId: string,

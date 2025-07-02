@@ -1,0 +1,30 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/teacher/chat-list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Chat</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" [scrollEvents]="true">
+  <div *ngFor="let msg of messages" class="message-bubble" [ngClass]="{'own': msg.sender === currentSender}">
+    <p>{{ msg.text }}</p>
+    <small>{{ msg.timestamp?.toDate() | date:'shortTime' }}</small>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-item>
+      <ion-input
+        [(ngModel)]="newMessage"
+        placeholder="Escribe un mensaje..."
+        (keyup.enter)="sendMessage()"
+      ></ion-input>
+      <ion-button slot="end" (click)="sendMessage()">
+        <ion-icon name="send-outline"></ion-icon>
+      </ion-button>
+    </ion-item>
+  </ion-toolbar>
+</ion-footer>

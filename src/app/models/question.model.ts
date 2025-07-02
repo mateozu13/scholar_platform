@@ -6,4 +6,5 @@ export interface Question {
   opciones?: string[];
   respuestaCorrecta: string | number;
   puntaje: number;
+  enunciado?: string;
 }
