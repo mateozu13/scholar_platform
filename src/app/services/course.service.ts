@@ -148,7 +148,7 @@ export class CourseService {
       return {
         id: doc.id,
         ...courseData,
-        profesorNombre: teacher?.nombre || 'Profesor desconocido',
+        profesorNombre: courseData?.profesor.nombre || 'Profesor desconocido',
       };
     } catch (error) {
       console.error('Error al obtener curso por ID:', error);
@@ -211,11 +211,11 @@ export class CourseService {
         const courseData = courseDoc.data() as Course;
         const estudiantes = courseData.estudiantes || [];
 
-        if (!estudiantes.includes(userId)) {
-          transaction.update(courseRef, {
-            estudiantes: [...estudiantes, userId],
-          });
-        }
+        // if (!estudiantes.includes(userId)) {
+        //   transaction.update(courseRef, {
+        //     estudiantes: [...estudiantes, userId],
+        //   });
+        // }
       });
     } catch (error) {
       console.error('Error al inscribir estudiante en curso:', error);
