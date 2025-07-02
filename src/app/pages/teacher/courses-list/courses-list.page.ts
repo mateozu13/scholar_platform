@@ -1,16 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
-
-interface Course {
-  id: string;
-  titulo: string;
-  descripcion: string;
-  imagenUrl?: string;
-  estudiantes?: number;
-}
+import { Course } from 'src/app/models/course.model';
+import { AngularFireAuth } from '@angular/fire/compat/auth';
 
 @Component({
   selector: 'app-courses-list',
@@ -19,29 +12,38 @@ interface Course {
   standalone: false,
 })
 export class CoursesListPage implements OnInit {
-  courses$: Observable<Course[]>;
+  courses: Course[] = [];
   isLoading = true;
+  userId: string = '';
 
-  constructor(private router: Router) {
-    const db = firebase.firestore();
-    const coursesRef = db.collection('courses');
+  constructor(private router: Router, private afAuth: AngularFireAuth) {}
 
-    // Convertimos manualmente a observable (legacy way)
-    this.courses$ = new Observable((observer) => {
-      coursesRef.onSnapshot((snapshot) => {
-        const data = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...(doc.data() as Course),
-        }));
-        observer.next(data);
-      });
+  ngOnInit() {
+    this.afAuth.authState.subscribe(async (user) => {
+      if (user) {
+        this.userId = user.uid;
+        await this.cargarCursos();
+        this.isLoading = false;
+      }
     });
   }
 
-  ngOnInit() {
-    this.courses$.subscribe(() => {
-      this.isLoading = false;
-    });
+  async cargarCursos() {
+    try {
+      const db = firebase.firestore();
+      const snapshot = await db
+        .collection('courses')
+        .where('profesorId', '==', this.userId)
+        .get();
+
+      this.courses = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Course),
+      }));
+    } catch (error) {
+      console.error('❌ Error al cargar cursos:', error);
+      alert('Error al obtener los cursos');
+    }
   }
 
   openCourseDetail(courseId: string) {

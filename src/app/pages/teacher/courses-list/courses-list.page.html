@@ -1,54 +1,29 @@
 <ion-header>
   <ion-toolbar color="primary">
-    <ion-buttons slot="start">
-      <ion-back-button defaultHref="/teacher/dashboard"></ion-back-button>
-    </ion-buttons>
     <ion-title>Mis Cursos</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <!-- Refrescar -->
-  <ion-refresher slot="fixed" (ionRefresh)="ngOnInit()">
-    <ion-refresher-content></ion-refresher-content>
-  </ion-refresher>
+  <ion-spinner *ngIf="isLoading" name="crescent" class="ion-margin-top"></ion-spinner>
 
-  <!-- Cargando -->
-  <ion-spinner *ngIf="isLoading" class="spinner-center"></ion-spinner>
+  <ion-list *ngIf="!isLoading && courses.length > 0">
+    <ion-item *ngFor="let course of courses" (click)="openCourseDetail(course.id)">
+      <ion-thumbnail slot="start" *ngIf="course.imagenUrl">
+        <img [src]="course.imagenUrl" />
+      </ion-thumbnail>
+      <ion-label>
+        <h2>{{ course.titulo }}</h2>
+        <p>{{ course.descripcion }}</p>
+        <ion-badge color="tertiary" *ngIf="course.estudiantes">
+          {{ course.estudiantes }} estudiantes
+        </ion-badge>
+      </ion-label>
+    </ion-item>
+  </ion-list>
 
-  <!-- Lista de cursos -->
-  <ion-grid *ngIf="!isLoading && (courses$ | async)?.length > 0">
-    <ion-row>
-      <ion-col size="12" size-md="6" *ngFor="let course of courses$ | async">
-        <ion-card class="course-card" (click)="openCourseDetail(course.id)">
-          <div class="course-thumbnail">
-            <img
-              *ngIf="course.imagenUrl"
-              [src]="course.imagenUrl"
-              alt="Imagen del curso"
-            />
-            <div *ngIf="!course.imagenUrl" class="thumbnail-fallback">
-              {{ course.titulo | slice:0:1 }}
-            </div>
-          </div>
-          <ion-card-header>
-            <ion-card-title>{{ course.titulo }}</ion-card-title>
-            <ion-card-subtitle>{{ course.descripcion }}</ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            <ion-badge color="primary">
-              {{ course.estudiantes || 0 }} estudiantes
-            </ion-badge>
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-
-  <!-- Estado vacío -->
-  <div *ngIf="!isLoading && (courses$ | async)?.length === 0" class="ion-text-center ion-padding">
-    <ion-icon name="school-outline" size="large"></ion-icon>
-    <h3>No hay cursos asignados aún</h3>
-    <p>Cuando tengas cursos disponibles, los verás aquí.</p>
+  <div *ngIf="!isLoading && courses.length === 0" class="ion-text-center ion-margin-top">
+    <ion-icon name="information-circle-outline" size="large"></ion-icon>
+    <p>No tienes cursos asignados.</p>
   </div>
 </ion-content>

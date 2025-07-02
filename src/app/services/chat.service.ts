@@ -6,8 +6,8 @@ import { Chat, Message } from '../models/chat.model';
   providedIn: 'root',
 })
 export class ChatService {
-  private readonly chatsCollection = 'Chats';
-  private readonly messagesCollection = 'Messages';
+  private readonly chatsCollection = 'chats';
+  private readonly messagesCollection = 'messages';
 
   constructor(private firestore: AngularFirestore) {}
 
