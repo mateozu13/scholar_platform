@@ -1,6 +1,6 @@
 export interface Course {
   id: string;
-  titulo: string;
+  name: string;
   descripcion: string;
   profesorId: string;
   profesorNombre?: string; // Campo calculado
@@ -12,4 +12,7 @@ export interface Course {
   imagenUrl?: string;
   assignmentsCount?: number; // Campo calculado
   completedAssignments?: number; // Campo calculado
+  deliveredSubmissions?: number; // Campo calculado
+  pendingSubmissions?: number; // Campo calculado
+  avgGrade?: number;
 }
