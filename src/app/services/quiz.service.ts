@@ -81,4 +81,18 @@ export class QuizService {
       )
       .valueChanges({ idField: 'id' });
   }
+  // Guardar comentario del docente
+async updateTeacherComment(submissionId: string, comentario: string): Promise<void> {
+  await this.firestore
+    .collection('quiz_submissions')
+    .doc(submissionId)
+    .update({ comentarioDocente: comentario });
+}
+getAttemptById(submissionId: string) {
+  return this.firestore
+    .collection<QuizAttempt>('quiz_submissions')
+    .doc(submissionId)
+    .valueChanges({ idField: 'id' });
+}
+
 }

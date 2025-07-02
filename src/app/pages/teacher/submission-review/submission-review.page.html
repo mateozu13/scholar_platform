@@ -1,0 +1,58 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Revisión de Entrega</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content *ngIf="!isLoading; else cargando">
+  <ion-card *ngIf="submission; else noEncontrado">
+    <ion-card-header>
+      <ion-card-title>{{ submission.titulo || 'Entrega sin título' }}</ion-card-title>
+      <ion-card-subtitle>Estudiante: {{ submission.studentName || 'Desconocido' }}</ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      <p><strong>Descripción:</strong> {{ submission.descripcion || 'No especificada' }}</p>
+      <p><strong>Enlace de entrega:</strong></p>
+      <ion-button
+        *ngIf="submission.enlace"
+        expand="block"
+        fill="outline"
+        color="primary"
+        href="{{ submission.enlace }}"
+        target="_blank">
+        Ver Archivo
+      </ion-button>
+
+      <ion-item>
+        <ion-label position="floating">Calificación (0 - 100)</ion-label>
+        <ion-input
+          type="number"
+          [(ngModel)]="calificacion"
+          min="0"
+          max="100"
+          required>
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Retroalimentación</ion-label>
+        <ion-textarea
+          [(ngModel)]="retroalimentacion"
+          placeholder="Escribe tus comentarios aquí">
+        </ion-textarea>
+      </ion-item>
+
+      <ion-button expand="block" (click)="guardarRevision()">Guardar Revisión</ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
+
+<ng-template #cargando>
+  <ion-spinner name="crescent"></ion-spinner>
+</ng-template>
+
+<ng-template #noEncontrado>
+  <ion-text color="danger">
+    <p class="ion-padding">❌ No se encontró la entrega.</p>
+  </ion-text>
+</ng-template>

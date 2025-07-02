@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/teacher/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Revisión del Quiz</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ng-container *ngIf="!isLoading; else loading">
+    <ion-card *ngIf="quiz">
+      <ion-card-header>
+        <ion-card-title>{{ quiz?.titulo }}</ion-card-title>
+        <ion-card-subtitle>{{ quiz?.descripcion }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <p><strong>Fecha de cierre:</strong> {{ quiz?.fechaCierre?.getDate()| date: 'medium' }}</p>
+        <p><strong>Puntaje total:</strong> {{ quiz?.puntosTotales }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-card *ngIf="submission">
+      <ion-card-header>
+        <ion-card-title>Entrega del estudiante</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <p><strong>Estudiante:</strong> {{ submission?.studentId }}</p>
+        <p><strong>Puntaje obtenido:</strong> {{ submission?.score }}</p>
+
+        <ion-item lines="full">
+          <ion-label position="stacked">Comentario del docente</ion-label>
+          <ion-textarea [(ngModel)]="comentarioDocente" rows="4"></ion-textarea>
+        </ion-item>
+
+        <ion-button expand="block" class="ion-margin-top" (click)="guardarComentario()">
+          Guardar Comentario
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+
+  <ng-template #loading>
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando revisión...</p>
+  </ng-template>
+</ion-content>

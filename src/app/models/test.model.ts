@@ -8,4 +8,5 @@ export interface Test {
   duracion?: number; // en minutos
   intentosPermitidos?: number;
   puntosTotales: number;
+  createdAt?: Date;
 }

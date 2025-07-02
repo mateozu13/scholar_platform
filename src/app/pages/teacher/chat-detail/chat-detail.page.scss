@@ -1,0 +1,13 @@
+.message-bubble {
+  background: #e0e0e0;
+  padding: 8px 12px;
+  margin: 8px;
+  border-radius: 10px;
+  max-width: 70%;
+  word-wrap: break-word;
+}
+
+.message-bubble.own {
+  background: #c8e6c9;
+  margin-left: auto;
+}

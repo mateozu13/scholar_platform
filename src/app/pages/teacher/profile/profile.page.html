@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/teacher/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Perfil</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+   <div class="ion-text-center" (click)="cambiarFoto()">
+    <ion-avatar class="avatar-click">
+      <img *ngIf="fotoUrl" [src]="fotoUrl" />
+      <ion-icon *ngIf="!fotoUrl" name="person-circle" size="large"></ion-icon>
+    </ion-avatar>
+    <p class="click-text">Toca para cambiar foto</p>
+    <h2>{{ email }}</h2>
+  </div>
+
+  <ion-item>
+    <ion-label position="floating">Nombre</ion-label>
+    <ion-input [(ngModel)]="nombre" [readonly]="!isEditing"></ion-input>
+  </ion-item>
+
+  <ion-button expand="block" (click)="toggleEdit()" color="warning" *ngIf="!isEditing">
+    Editar perfil
+  </ion-button>
+
+  <ion-button expand="block" (click)="guardarCambios()" color="success" *ngIf="isEditing">
+    Guardar cambios
+  </ion-button>
+
+  <ion-button expand="block" color="danger" (click)="logout()">
+    Cerrar sesión
+  </ion-button>
+</ion-content>

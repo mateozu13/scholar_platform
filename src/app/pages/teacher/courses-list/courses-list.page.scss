@@ -1,0 +1,25 @@
+.spinner-center {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.course-thumbnail {
+  height: 160px;
+  background: #f0f0f0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.course-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thumbnail-fallback {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #666;
+}

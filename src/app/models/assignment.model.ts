@@ -12,4 +12,5 @@ export interface Assignment {
   studentName?: string;
   courseTitle?: string;
   submissionDate?: Date;
+  createdAt?: Date;
 }

@@ -1,0 +1,39 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Subir Material</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form (ngSubmit)="subirMaterial()">
+    <ion-list lines="inset">
+      <ion-item>
+        <ion-label position="floating">Título *</ion-label>
+        <ion-input [(ngModel)]="material.titulo" name="titulo" required></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">Descripción</ion-label>
+        <ion-textarea [(ngModel)]="material.descripcion" name="descripcion"></ion-textarea>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Tipo *</ion-label>
+        <ion-select [(ngModel)]="material.tipo" name="tipo" interface="popover">
+          <ion-select-option *ngFor="let tipo of tipos" [value]="tipo.value">
+            {{ tipo.label }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="floating">URL *</ion-label>
+        <ion-input [(ngModel)]="material.url" name="url" required></ion-input>
+      </ion-item>
+    </ion-list>
+
+    <ion-button expand="block" type="submit" class="ion-margin-top">
+      Subir Material
+    </ion-button>
+  </form>
+</ion-content>

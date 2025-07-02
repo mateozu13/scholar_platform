@@ -7,4 +7,5 @@ export interface QuizAttempt {
   fechaEnvio: Date;
   duracionUtilizada?: number; // en minutos
   aprobado?: boolean;
+  comentarioDocente?: string;
 }

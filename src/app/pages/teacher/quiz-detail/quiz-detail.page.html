@@ -1,0 +1,36 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/teacher/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle del Quiz</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ng-container *ngIf="isLoading">
+    <ion-spinner name="dots"></ion-spinner>
+  </ng-container>
+
+  <ng-container *ngIf="!isLoading && quiz">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ quiz.titulo }}</ion-card-title>
+        <ion-card-subtitle>Curso: {{ quiz.courseId }}</ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <p><strong>Descripción:</strong> {{ quiz.descripcion || 'Sin descripción' }}</p>
+        <p><strong>Puntaje total:</strong> {{ quiz.puntosTotales }}</p>
+        <p><strong>Fecha de cierre:</strong> {{ quiz.fechaCierre?.getDate()| date:'medium' }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <ion-button expand="block" color="tertiary" [routerLink]="['/teacher/quiz-results', quizId]">
+      Ver Resultados de los Estudiantes
+    </ion-button>
+  </ng-container>
+
+  <ng-container *ngIf="!isLoading && !quiz">
+    <ion-text color="danger">❌ No se pudo cargar el quiz.</ion-text>
+  </ng-container>
+</ion-content>
