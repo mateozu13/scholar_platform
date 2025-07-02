@@ -7,6 +7,7 @@ import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 
+
 import { AngularFireModule, FIREBASE_OPTIONS } from '@angular/fire/compat';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
@@ -27,6 +28,7 @@ Chart.register(...registerables);
     AngularFireStorageModule,
     AngularFirestoreModule,
     AngularFireAuthModule,
+
     // otros modulos
     FormsModule,
     ReactiveFormsModule,
@@ -36,6 +38,7 @@ Chart.register(...registerables);
   providers: [
     { provide: FIREBASE_OPTIONS, useValue: environment.firebase },
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    
   ],
   bootstrap: [AppComponent],
 })
