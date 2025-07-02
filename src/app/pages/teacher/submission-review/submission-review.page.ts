@@ -46,8 +46,8 @@ export class SubmissionReviewPage implements OnInit {
   }
 
   async guardarRevision() {
-    if (this.calificacion === null || this.calificacion < 0 || this.calificacion > 100) {
-      alert('Ingrese una calificación válida entre 0 y 100.');
+    if (this.calificacion === null || this.calificacion < 0 || this.calificacion > 10) {
+      alert('Ingrese una calificación válida entre 0 y 10.');
       return;
     }
 

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Firestore, collection, addDoc } from '@angular/fire/firestore';
-import { doc, collection as subcollection } from 'firebase/firestore';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
 
 @Component({
   selector: 'app-material-upload',
@@ -24,13 +24,9 @@ export class MaterialUploadPage implements OnInit {
     { value: 'link', label: 'Enlace Web' }
   ];
 
-  constructor(
-    private route: ActivatedRoute,
-    private firestore: Firestore
-  ) {}
+  constructor(private route: ActivatedRoute) {}
 
   ngOnInit() {
-    // Preferible usar paramMap para rutas con /:courseId
     this.courseId = this.route.snapshot.paramMap.get('courseId') || '';
   }
 
@@ -41,10 +37,13 @@ export class MaterialUploadPage implements OnInit {
     }
 
     try {
-      const courseDocRef = doc(this.firestore, 'courses', this.courseId);
-      const materialesRef = subcollection(courseDocRef, 'materiales');
-      
-      await addDoc(materialesRef, {
+      const db = firebase.firestore();
+      const materialesRef = db
+        .collection('courses')
+        .doc(this.courseId)
+        .collection('materiales');
+
+      await materialesRef.add({
         ...this.material,
         fechaSubida: new Date()
       });

@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Firestore, collection, collectionData } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
 
 interface Course {
   id: string;
@@ -21,15 +22,23 @@ export class CoursesListPage implements OnInit {
   courses$: Observable<Course[]>;
   isLoading = true;
 
-  constructor(private router: Router, private firestore: Firestore) {
-    const coursesCollection = collection(this.firestore, 'courses');
-    this.courses$ = collectionData(coursesCollection, {
-      idField: 'id',
-    }) as Observable<Course[]>;
+  constructor(private router: Router) {
+    const db = firebase.firestore();
+    const coursesRef = db.collection('courses');
+
+    // Convertimos manualmente a observable (legacy way)
+    this.courses$ = new Observable((observer) => {
+      coursesRef.onSnapshot((snapshot) => {
+        const data = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...(doc.data() as Course),
+        }));
+        observer.next(data);
+      });
+    });
   }
 
   ngOnInit() {
-    // Marca como cargando solo hasta que obtenga el primer valor
     this.courses$.subscribe(() => {
       this.isLoading = false;
     });
