@@ -9,6 +9,8 @@ export interface User {
   telefono?: string;
   bio?: string;
   createdAt: Date;
+  lastLogin?: Date;
+  active: boolean;
 
   progresoGlobal?: number; // % de progreso general
   promedioCalificaciones?: number; // Promedio de calificaciones

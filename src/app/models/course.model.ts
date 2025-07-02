@@ -8,8 +8,6 @@ export interface Course {
   estudiantesCount?: number; // Campo calculado
   fechaInicio?: Date;
   fechaFin?: Date;
-  precio?: number;
-  categoria?: string;
   nivel?: string;
   imagenUrl?: string;
   assignmentsCount?: number; // Campo calculado
