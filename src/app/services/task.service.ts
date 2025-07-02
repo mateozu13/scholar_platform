@@ -11,8 +11,8 @@ import { CourseService } from './course.service';
   providedIn: 'root',
 })
 export class TaskService {
-  private readonly assignmentsCollection = 'Assignments';
-  private readonly submissionsCollection = 'Submissions';
+  private readonly assignmentsCollection = 'assignments';
+  private readonly submissionsCollection = 'submissions';
   private assignmentsRef = firebase
     .firestore()
     .collection(this.assignmentsCollection);

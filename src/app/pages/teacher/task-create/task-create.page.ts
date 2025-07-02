@@ -35,7 +35,7 @@ export class TaskCreatePage implements OnInit {
     }
 
     const newTask: Assignment = {
-      id: firebase.firestore().collection('Assignments').doc().id,
+      id: firebase.firestore().collection('assignments').doc().id,
       courseId: this.courseId,
       titulo: this.task.titulo,
       descripcion: this.task.descripcion,

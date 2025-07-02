@@ -8,9 +8,9 @@ import { QuizAttempt } from '../models/quiz-attempt.model';
   providedIn: 'root',
 })
 export class QuizService {
-  private readonly testsCollection = 'Tests';
-  private readonly questionsCollection = 'Questions';
-  private readonly attemptsCollection = 'QuizAttempts';
+  private readonly testsCollection = 'tests';
+  private readonly questionsCollection = 'questions';
+  private readonly attemptsCollection = 'quizAttempts';
 
   constructor(private firestore: AngularFirestore) {}
 

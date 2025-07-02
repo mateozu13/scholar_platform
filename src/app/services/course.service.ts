@@ -9,8 +9,8 @@ import { UserService } from './user.service';
 })
 export class CourseService {
   private db = firebase.firestore();
-  private coursesCollection = 'Courses';
-  private enrollmentsCollection = 'Enrollments';
+  private coursesCollection = 'courses';
+  private enrollmentsCollection = 'enrollments';
 
   constructor(private userService: UserService) {}
 
@@ -93,7 +93,7 @@ export class CourseService {
 
           // 5. Obtener tareas del curso
           const assignmentsSnapshot = await this.db
-            .collection('Assignments')
+            .collection('assignments')
             .where('courseId', '==', doc.id)
             .get();
 
