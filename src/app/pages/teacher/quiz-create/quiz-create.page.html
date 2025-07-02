@@ -44,7 +44,7 @@
           <div *ngFor="let opcion of pregunta.opciones; let j = index">
             <ion-item>
               <ion-label position="floating">Opción {{ j + 1 }}</ion-label>
-              <ion-input [(ngModel)]="pregunta.opciones[j]"></ion-input>
+              <ion-input [(ngModel)]="opcion.texto"></ion-input>
             </ion-item>
           </div>
 

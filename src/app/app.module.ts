@@ -18,6 +18,7 @@ import { Chart, registerables } from 'chart.js';
 import { UserDetailModalComponent } from './components/user-detail-modal/user-detail-modal.component';
 import { Camera } from '@capacitor/camera';
 
+
 Chart.register(...registerables);
 @NgModule({
   declarations: [AppComponent, AvatarComponent, UserDetailModalComponent],
@@ -28,6 +29,7 @@ Chart.register(...registerables);
     AngularFireStorageModule,
     AngularFirestoreModule,
     AngularFireAuthModule,
+    
 
     // otros modulos
     FormsModule,

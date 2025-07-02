@@ -20,10 +20,20 @@ export class ChatListPage implements OnInit {
     private router: Router
   ) {}
 
- async ngOnInit() {
-  this.currentUserId = await this.authService.getCurrentUserId();
-  this.listenToChats();
-}
+  async ngOnInit() {
+    try {
+      this.currentUserId = await this.authService.getCurrentUserId();
+
+      if (!this.currentUserId) {
+        console.warn('⚠️ Usuario no autenticado');
+        return;
+      }
+
+      this.listenToChats();
+    } catch (error) {
+      console.error('❌ Error obteniendo usuario:', error);
+    }
+  }
 
   listenToChats() {
     this.chatService.getUserChats(this.currentUserId).subscribe((data) => {
@@ -35,7 +45,7 @@ export class ChatListPage implements OnInit {
     this.router.navigate([`/teacher/chat-detail/${chatId}`]);
   }
 
-   obtenerOtroUsuario(usuarios: string[]): string {
+  obtenerOtroUsuario(usuarios: string[]): string {
     return usuarios.find(uid => uid !== this.currentUserId) || 'Desconocido';
   }
 }

@@ -8,17 +8,27 @@ import 'firebase/compat/storage';
 export class StorageService {
   private storage = firebase.storage();
 
-  // Subir archivo
+  // Subir archivo y devolver URL
   async uploadFile(file: File, path: string): Promise<string> {
-    const filePath = `${path}/${Date.now()}_${file.name}`;
-    const ref = this.storage.ref(filePath);
-    await ref.put(file);
-    return ref.getDownloadURL();
+    try {
+      const filePath = `${path}/${Date.now()}_${file.name}`;
+      const ref = this.storage.ref(filePath);
+      const snapshot = await ref.put(file);
+      return await snapshot.ref.getDownloadURL();
+    } catch (error) {
+      console.error('❌ Error al subir archivo:', error);
+      throw error;
+    }
   }
 
-  // Eliminar archivo
+  // Eliminar archivo desde URL
   async deleteFile(url: string): Promise<void> {
-    const ref = this.storage.refFromURL(url);
-    await ref.delete();
+    try {
+      const ref = this.storage.refFromURL(url);
+      await ref.delete();
+    } catch (error) {
+      console.error('❌ Error al eliminar archivo:', error);
+      throw error;
+    }
   }
 }

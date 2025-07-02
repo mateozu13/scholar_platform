@@ -3,40 +3,80 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/teacher/dashboard"></ion-back-button>
     </ion-buttons>
-    <ion-title>Subir Material</ion-title>
+    <ion-title>Materiales del Curso</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <form (ngSubmit)="subirMaterial()">
-    <ion-list lines="inset">
+
+  <!-- FORMULARIO -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Subir nuevo material</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
       <ion-item>
-        <ion-label position="floating">Título *</ion-label>
-        <ion-input [(ngModel)]="material.titulo" name="titulo" required></ion-input>
+        <ion-label position="floating">Título</ion-label>
+        <ion-input [(ngModel)]="material.titulo"></ion-input>
       </ion-item>
 
       <ion-item>
         <ion-label position="floating">Descripción</ion-label>
-        <ion-textarea [(ngModel)]="material.descripcion" name="descripcion"></ion-textarea>
+        <ion-textarea [(ngModel)]="material.descripcion"></ion-textarea>
       </ion-item>
 
       <ion-item>
-        <ion-label>Tipo *</ion-label>
-        <ion-select [(ngModel)]="material.tipo" name="tipo" interface="popover">
+        <ion-label>Tipo</ion-label>
+        <ion-select [(ngModel)]="material.tipo">
           <ion-select-option *ngFor="let tipo of tipos" [value]="tipo.value">
             {{ tipo.label }}
           </ion-select-option>
         </ion-select>
       </ion-item>
 
-      <ion-item>
-        <ion-label position="floating">URL *</ion-label>
-        <ion-input [(ngModel)]="material.url" name="url" required></ion-input>
-      </ion-item>
-    </ion-list>
+      <div *ngIf="material.tipo === 'link'">
+        <ion-item>
+          <ion-label position="floating">URL del recurso</ion-label>
+          <ion-input [(ngModel)]="material.url"></ion-input>
+        </ion-item>
+      </div>
 
-    <ion-button expand="block" type="submit" class="ion-margin-top">
-      Subir Material
-    </ion-button>
-  </form>
+      <div *ngIf="material.tipo !== 'link'">
+        <ion-item>
+          <ion-label>Archivo</ion-label>
+          <input type="file" (change)="onFileSelected($event)" />
+        </ion-item>
+      </div>
+
+      <ion-button expand="block" (click)="subirMaterial()">Subir Material</ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- LISTA DE MATERIALES -->
+  <ion-list *ngIf="materiales.length > 0">
+    <ion-list-header>
+      <ion-label>Materiales Subidos</ion-label>
+    </ion-list-header>
+
+    <ion-item *ngFor="let mat of materiales">
+      <ion-label>
+        <h2>{{ mat.titulo }}</h2>
+        <p>{{ mat.descripcion }}</p>
+        <small>Tipo: {{ mat.tipo }}</small>
+      </ion-label>
+      <ion-buttons slot="end">
+        <ion-button fill="clear" [href]="mat.url" target="_blank">
+          Ver
+        </ion-button>
+        <ion-button fill="clear" color="danger" (click)="eliminarMaterial(mat.id, mat.url, mat.tipo)">
+          Eliminar
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
+  </ion-list>
+
+  <div *ngIf="materiales.length === 0" class="ion-text-center">
+    <p>No hay materiales aún</p>
+  </div>
+
 </ion-content>

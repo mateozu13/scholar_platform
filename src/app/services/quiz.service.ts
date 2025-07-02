@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { AngularFirestore } from '@angular/fire/compat/firestore';
+import firebase from 'firebase/compat/app';
+import 'firebase/compat/firestore';
 import { Test } from '../models/test.model';
 import { Question } from '../models/question.model';
 import { QuizAttempt } from '../models/quiz-attempt.model';
@@ -8,11 +9,12 @@ import { QuizAttempt } from '../models/quiz-attempt.model';
   providedIn: 'root',
 })
 export class QuizService {
+  private firestore = firebase.firestore();
   private readonly testsCollection = 'tests';
   private readonly questionsCollection = 'questions';
   private readonly attemptsCollection = 'quizAttempts';
 
-  constructor(private firestore: AngularFirestore) {}
+  constructor() {}
 
   // Crear prueba (profesor)
   createTest(test: Test): Promise<void> {
@@ -24,19 +26,30 @@ export class QuizService {
 
   // Obtener pruebas por curso
   getTestsByCourse(courseId: string) {
-    return this.firestore
-      .collection<Test>(this.testsCollection, (ref) =>
-        ref.where('courseId', '==', courseId).orderBy('fechaCierre')
-      )
-      .valueChanges({ idField: 'id' });
+    return new Promise<Test[]>((resolve, reject) => {
+      this.firestore
+        .collection(this.testsCollection)
+        .where('courseId', '==', courseId)
+        .orderBy('fechaCierre')
+        .get()
+        .then((snapshot) => {
+          const data = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...(doc.data() as Test),
+          }));
+          resolve(data);
+        })
+        .catch(reject);
+    });
   }
 
   // Obtener prueba por ID
-  getTestById(testId: string) {
-    return this.firestore
-      .collection<Test>(this.testsCollection)
+  async getTestById(testId: string): Promise<Test | null> {
+    const doc = await this.firestore
+      .collection(this.testsCollection)
       .doc(testId)
-      .valueChanges();
+      .get();
+    return doc.exists ? (doc.data() as Test) : null;
   }
 
   // Agregar pregunta a prueba
@@ -48,12 +61,15 @@ export class QuizService {
   }
 
   // Obtener preguntas de prueba
-  getQuestionsByTest(testId: string) {
-    return this.firestore
-      .collection<Question>(this.questionsCollection, (ref) =>
-        ref.where('testId', '==', testId)
-      )
-      .valueChanges({ idField: 'id' });
+  async getQuestionsByTest(testId: string): Promise<Question[]> {
+    const snapshot = await this.firestore
+      .collection(this.questionsCollection)
+      .where('testId', '==', testId)
+      .get();
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...(doc.data() as Question),
+    }));
   }
 
   // Enviar intento de prueba
@@ -65,34 +81,47 @@ export class QuizService {
   }
 
   // Obtener intentos por prueba
-  getAttemptsByTest(testId: string) {
-    return this.firestore
-      .collection<QuizAttempt>(this.attemptsCollection, (ref) =>
-        ref.where('testId', '==', testId)
-      )
-      .valueChanges({ idField: 'id' });
+  async getAttemptsByTest(testId: string): Promise<QuizAttempt[]> {
+    const snapshot = await this.firestore
+      .collection(this.attemptsCollection)
+      .where('testId', '==', testId)
+      .get();
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...(doc.data() as QuizAttempt),
+    }));
   }
+
+  // Eliminar prueba
+deleteTest(testId: string): Promise<void> {
+  return this.firestore.collection('tests').doc(testId).delete();
+}
 
   // Obtener intentos por estudiante
-  getAttemptsByStudent(studentId: string) {
-    return this.firestore
-      .collection<QuizAttempt>(this.attemptsCollection, (ref) =>
-        ref.where('studentId', '==', studentId)
-      )
-      .valueChanges({ idField: 'id' });
+  async getAttemptsByStudent(studentId: string): Promise<QuizAttempt[]> {
+    const snapshot = await this.firestore
+      .collection(this.attemptsCollection)
+      .where('studentId', '==', studentId)
+      .get();
+    return snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...(doc.data() as QuizAttempt),
+    }));
   }
-  // Guardar comentario del docente
-async updateTeacherComment(submissionId: string, comentario: string): Promise<void> {
-  await this.firestore
-    .collection('quiz_submissions')
-    .doc(submissionId)
-    .update({ comentarioDocente: comentario });
-}
-getAttemptById(submissionId: string) {
-  return this.firestore
-    .collection<QuizAttempt>('quiz_submissions')
-    .doc(submissionId)
-    .valueChanges({ idField: 'id' });
-}
 
+  // Guardar comentario del docente
+  async updateTeacherComment(submissionId: string, comentario: string): Promise<void> {
+    await this.firestore
+      .collection('quiz_submissions')
+      .doc(submissionId)
+      .update({ comentarioDocente: comentario });
+  }
+
+  async getAttemptById(submissionId: string): Promise<QuizAttempt | null> {
+    const doc = await this.firestore
+      .collection('quiz_submissions')
+      .doc(submissionId)
+      .get();
+    return doc.exists ? (doc.data() as QuizAttempt) : null;
+  }
 }

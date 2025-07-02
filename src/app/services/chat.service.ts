@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore } from '@angular/fire/compat/firestore';
+import firebase from 'firebase/compat/app';
 import { Chat, Message } from '../models/chat.model';
 
 @Injectable({
@@ -11,7 +12,7 @@ export class ChatService {
 
   constructor(private firestore: AngularFirestore) {}
 
-  // Crear o obtener chat existente
+  // Crear o retornar chat existente
   async getOrCreateChat(userId1: string, userId2: string): Promise<string> {
     const sortedIds = [userId1, userId2].sort();
     const chatId = sortedIds.join('_');
@@ -22,7 +23,7 @@ export class ChatService {
       .get()
       .toPromise();
 
-    if (!chatDoc.exists) {
+    if (!chatDoc?.exists) {
       const newChat: Chat = {
         id: chatId,
         usuarios: sortedIds,
@@ -38,13 +39,14 @@ export class ChatService {
   }
 
   // Enviar mensaje
-  sendMessage(
+  async sendMessage(
     chatId: string,
     senderId: string,
     content: string
   ): Promise<void> {
+    const messageId = this.firestore.createId();
     const message: Message = {
-      id: this.firestore.createId(),
+      id: messageId,
       chatId,
       senderId,
       contenido: content,
@@ -52,30 +54,30 @@ export class ChatService {
       visto: false,
     };
 
-    // Actualizar último mensaje en chat
-    this.firestore.collection(this.chatsCollection).doc(chatId).update({
+    const chatRef = this.firestore.collection(this.chatsCollection).doc(chatId);
+
+    // Actualiza datos del chat (último mensaje)
+    await chatRef.update({
       ultimoMensaje: content,
       timestampUltimo: new Date(),
     });
 
+    // Guarda el mensaje en subcolección
+    await chatRef.collection(this.messagesCollection).doc(messageId).set(message);
+  }
+
+  // Obtener mensajes de un chat (observable)
+  getChatMessages(chatId: string) {
     return this.firestore
       .collection(this.chatsCollection)
       .doc(chatId)
-      .collection(this.messagesCollection)
-      .doc(message.id)
-      .set(message);
-  }
-
-  // Obtener mensajes de un chat
-  getChatMessages(chatId: string) {
-    return this.firestore
-      .collection<Message>(this.chatsCollection)
-      .doc(chatId)
-      .collection(this.messagesCollection, (ref) => ref.orderBy('timestamp'))
+      .collection<Message>(this.messagesCollection, (ref) =>
+        ref.orderBy('timestamp')
+      )
       .valueChanges({ idField: 'id' });
   }
 
-  // Obtener chats de un usuario
+  // Obtener los chats del usuario (observable)
   getUserChats(userId: string) {
     return this.firestore
       .collection<Chat>(this.chatsCollection, (ref) =>
@@ -87,21 +89,21 @@ export class ChatService {
   }
 
   // Marcar mensajes como leídos
-  markMessagesAsRead(chatId: string, userId: string): Promise<void> {
-    return this.firestore
+  async markMessagesAsRead(chatId: string, userId: string): Promise<void> {
+    const messagesRef = this.firestore
       .collection(this.chatsCollection)
       .doc(chatId)
       .collection(this.messagesCollection, (ref) =>
         ref.where('senderId', '!=', userId).where('visto', '==', false)
-      )
-      .get()
-      .toPromise()
-      .then((snapshot) => {
-        const batch = this.firestore.firestore.batch();
-        snapshot.docs.forEach((doc) => {
-          batch.update(doc.ref, { visto: true });
-        });
-        return batch.commit();
-      });
+      );
+
+    const snapshot = await messagesRef.get().toPromise();
+
+    const batch = this.firestore.firestore.batch();
+    snapshot?.docs.forEach((doc) => {
+      batch.update(doc.ref, { visto: true });
+    });
+
+    await batch.commit();
   }
 }

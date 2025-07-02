@@ -20,24 +20,28 @@ export class QuizDetailPage implements OnInit {
     private router: Router
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.quizId = this.route.snapshot.paramMap.get('id') || '';
     if (this.quizId) {
-      this.cargarQuiz();
+      await this.cargarQuiz();
     } else {
       this.router.navigate(['/teacher/dashboard']);
     }
   }
 
-  cargarQuiz() {
-    this.quizService.getTestById(this.quizId).subscribe((data) => {
-      if (data) {
-        this.quiz = data as Test;
-      } else {
+  async cargarQuiz() {
+    try {
+      this.quiz = await this.quizService.getTestById(this.quizId);
+      if (!this.quiz) {
         alert('❌ Quiz no encontrado');
         this.router.navigate(['/teacher/dashboard']);
       }
+    } catch (error) {
+      console.error('❌ Error al cargar el quiz:', error);
+      alert('❌ Ocurrió un error al cargar el quiz');
+      this.router.navigate(['/teacher/dashboard']);
+    } finally {
       this.isLoading = false;
-    });
+    }
   }
 }

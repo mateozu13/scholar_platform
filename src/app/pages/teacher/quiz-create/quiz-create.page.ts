@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { QuizService } from 'src/app/services/quiz.service';
 import { v4 as uuidv4 } from 'uuid';
 
+
 @Component({
   selector: 'app-quiz-create',
   templateUrl: './quiz-create.page.html',
@@ -20,6 +21,7 @@ export class QuizCreatePage implements OnInit {
     private router: Router,
     private quizService: QuizService
     
+    
   ) {}
 
   ngOnInit() {
@@ -30,12 +32,17 @@ export class QuizCreatePage implements OnInit {
 
   agregarPregunta() {
     this.preguntas.push({
-      texto: '',
-      tipo: 'opcion_multiple',
-      opciones: ['', '', '', ''],
-      respuestaCorrecta: 0,
-      puntaje: 1,
-    });
+  texto: '',
+  tipo: 'opcion_multiple',
+  opciones: [
+    { texto: '' },
+    { texto: '' },
+    { texto: '' },
+    { texto: '' }
+  ],
+  respuestaCorrecta: 0,
+  puntaje: 1,
+});
   }
 
   eliminarPregunta(index: number) {
