@@ -10,6 +10,7 @@ import { User } from '../models/user.model';
 })
 export class AuthService {
   private auth = firebase.auth();
+  private usersRef = firebase.firestore().collection('Users');
 
   constructor(private userService: UserService, private router: Router) {}
 
@@ -24,17 +25,24 @@ export class AuthService {
       const persistence = rememberMe
         ? firebase.auth.Auth.Persistence.LOCAL
         : firebase.auth.Auth.Persistence.SESSION;
-
       await this.auth.setPersistence(persistence);
 
+      // Autenticar usuario
       const userCredential = await this.auth.signInWithEmailAndPassword(
         email,
         password
       );
-      if (userCredential.user) {
-        return this.userService.getUserById(userCredential.user.uid);
+      const uid = userCredential.user?.uid;
+      if (!uid) {
+        return null;
       }
-      return null;
+
+      // Actualizar lastLogin en Firestore
+      const now = new Date();
+      await this.usersRef.doc(uid).update({ lastLogin: now });
+
+      // Recuperar datos completos del usuario
+      return this.userService.getUserById(uid);
     } catch (error) {
       console.error('Error en login:', error);
       throw error;
@@ -72,10 +80,10 @@ export class AuthService {
   }
 
   // Obtener solo el UID del usuario autenticado
-async getCurrentUserId(): Promise<string> {
-  const user = this.auth.currentUser;
-  return user?.uid || '';
-}
+  async getCurrentUserId(): Promise<string> {
+    const user = this.auth.currentUser;
+    return user?.uid || '';
+  }
 
   // Cambiar contraseña
   async changePassword(

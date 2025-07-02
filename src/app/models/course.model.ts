@@ -1,6 +1,6 @@
 export interface Course {
   id: string;
-  name: string;
+  titulo: string;
   descripcion: string;
   profesorId: string;
   profesorNombre?: string; // Campo calculado
@@ -15,4 +15,5 @@ export interface Course {
   deliveredSubmissions?: number; // Campo calculado
   pendingSubmissions?: number; // Campo calculado
   avgGrade?: number;
+  activo: boolean;
 }
