@@ -1,11 +1,14 @@
+import { User } from './user.model';
+
 export interface Course {
   id: string;
   titulo: string;
   descripcion: string;
   profesorId: string;
-  profesorNombre?: string; // Campo calculado
-  estudiantes?: string[]; // IDs de estudiantes
-  estudiantesCount?: number; // Campo calculado
+  profesor?: User;
+  profesorNombre?: string;
+  estudiantes?: User[];
+  estudiantesCount?: number; // Campo calculado (número de estudiantes)
   fechaInicio?: Date;
   fechaFin?: Date;
   nivel?: string;
@@ -15,5 +18,5 @@ export interface Course {
   deliveredSubmissions?: number; // Campo calculado
   pendingSubmissions?: number; // Campo calculado
   avgGrade?: number;
-  activo: boolean;
+  activo?: boolean; // Campo añadido para indicar si el curso está activo
 }
