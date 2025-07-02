@@ -5,7 +5,7 @@ import { QuizCreatePage } from './quiz-create.page';
 
 const routes: Routes = [
   {
-    path: 'quiz-create/:courseId',
+    path: '',
 
     component: QuizCreatePage
   }
