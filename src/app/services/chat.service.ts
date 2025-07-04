@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore'; // Asegúrate de que Firestore esté importado
-import { from, Observable } from 'rxjs';
+import { BehaviorSubject, from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Chat, Message } from '../models/chat.model'; // Asegúrate de que tus modelos estén correctamente definidos
+import { OfflineQueueService } from './offline-queue.service';
+import { ToastController } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root',
@@ -11,8 +13,15 @@ import { Chat, Message } from '../models/chat.model'; // Asegúrate de que tus m
 export class ChatService {
   // Inicializa la instancia de Firestore
   private db = firebase.firestore();
+  private messageSentSource = new BehaviorSubject<Message | null>(null);
+  messageSent$ = this.messageSentSource.asObservable();
 
-  constructor() {}
+  constructor(
+    private offlineQueue: OfflineQueueService,
+    private toastController: ToastController
+  ) {
+    window.addEventListener('online', () => this.processQueue());
+  }
 
   /**
    * Obtiene todos los chats de un usuario en tiempo real.
@@ -178,29 +187,88 @@ export class ChatService {
    * @param text El contenido del mensaje.
    * @returns Una promesa que resuelve con el nuevo objeto Message.
    */
-  async sendMessage(chatId: string, senderId: string, text: string) {
-    const messagesRef = this.db.collection(`chats/${chatId}/messages`);
-    const chatRef = this.db.collection('chats').doc(chatId);
+  async sendMessage(
+    chatId: string,
+    senderId: string,
+    text: string
+  ): Promise<void> {
+    const messageText = text.trim();
+    if (!messageText) return;
 
+    // Crear objeto de mensaje
     const newMessage: Message = {
       chatId,
       senderId,
-      text,
-      timestamp:
-        firebase.firestore.FieldValue.serverTimestamp() as firebase.firestore.Timestamp,
+      text: messageText,
+      timestamp: firebase.firestore.Timestamp.now(),
       status: 'sent',
-      readAt: null,
     };
 
-    // Añadir el mensaje a la subcolección de mensajes
-    await messagesRef.add(newMessage);
+    // Verificar conexión
+    if (!navigator.onLine) {
+      newMessage.status = 'queued';
+      await this.offlineQueue.addMessageToQueue(newMessage);
+      this.messageSentSource.next(newMessage); // Notificar a los componentes
+      return;
+    }
 
-    // Actualizar el documento del chat con el último mensaje y su timestamp
-    await chatRef.update({
-      lastMessage: text,
-      lastMessageTimestamp: newMessage.timestamp,
+    try {
+      await this.sendToFirestore(chatId, newMessage);
+      this.messageSentSource.next(newMessage); // Notificar a los componentes
+    } catch (error) {
+      if (error.code === 'unavailable' || error.message.includes('network')) {
+        newMessage.status = 'queued';
+        await this.offlineQueue.addMessageToQueue(newMessage);
+        this.messageSentSource.next(newMessage); // Notificar a los componentes
+      }
+    }
+  }
+
+  // Enviar mensaje a Firestore
+  private async sendToFirestore(
+    chatId: string,
+    message: Message
+  ): Promise<void> {
+    // Añadir el mensaje a la subcolección
+    const docRef = await this.db
+      .collection(`chats/${chatId}/messages`)
+      .add(message);
+
+    // Actualizar el documento del chat con el último mensaje
+    await this.db.collection('chats').doc(chatId).update({
+      lastMessage: message.text,
+      lastMessageTimestamp: message.timestamp,
     });
 
-    return newMessage;
+    // Actualizar el ID del mensaje
+    message.id = docRef.id;
+  }
+
+  // Procesar cola cuando hay conexión
+  async processQueue(): Promise<void> {
+    const queue = this.offlineQueue.getQueue();
+    if (queue.length === 0) return;
+
+    try {
+      // Enviar todos los mensajes en orden
+      let message: any;
+      for (message of queue) {
+        await this.sendToFirestore(message.chatId, message.text);
+      }
+
+      // Limpiar cola después de enviar
+      this.offlineQueue.removeMessages(message.chatId);
+
+      // Mostrar notificación de éxito
+      const toast = await this.toastController.create({
+        message: `Se enviaron ${queue.length} mensajes pendientes`,
+        duration: 5000,
+        position: 'bottom',
+        color: 'success',
+      });
+      toast.present();
+    } catch (error) {
+      console.error('Error al procesar cola de mensajes:', error);
+    }
   }
 }

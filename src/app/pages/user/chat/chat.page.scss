@@ -70,4 +70,41 @@ ion-footer {
     --padding-end: 15px;
     border-radius: 20px;
   }
+
+  .offline-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    background-color: #ffc107;
+    color: #333;
+    font-size: 0.9rem;
+    font-weight: 500;
+
+    ion-icon {
+      margin-right: 8px;
+      font-size: 1.2rem;
+    }
+  }
+}
+
+.offline {
+  opacity: 0.7;
+
+  .message {
+    background-color: #e0e0e0 !important;
+    color: #555 !important;
+  }
+
+  .offline-indicator {
+    display: flex;
+    align-items: center;
+    font-size: 0.7rem;
+    color: #f57c00;
+    margin-left: 5px;
+
+    ion-icon {
+      margin-right: 3px;
+    }
+  }
 }
