@@ -1,0 +1,60 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/student/quiz-list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Evaluación</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card *ngFor="let question of questions; let i = index">
+    <ion-card-header>
+      <ion-card-title>Pregunta {{ i + 1 }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p>{{ question.texto }}</p>
+
+      <!-- OPCIÓN MÚLTIPLE -->
+      <div *ngIf="question.tipo === 'opcion_multiple'">
+        <ion-list>
+          <ion-radio-group [value]="answers[question.id]" [disabled]="isReviewMode">
+            <ion-item *ngFor="let opcion of question.opciones">
+              <ion-label>{{ opcion }}</ion-label>
+              <ion-radio slot="start" [value]="opcion"
+                [class.correct]="isReviewMode && opcion === question.respuestaCorrecta"></ion-radio>
+            </ion-item>
+          </ion-radio-group>
+        </ion-list>
+      </div>
+
+
+      <!-- Verdadero/Falso -->
+      <ng-container *ngIf="question.tipo === 'verdadero_falso'">
+        <ion-radio-group [(ngModel)]="respuestas[question.id]">
+          <ion-item>
+            <ion-label>Verdadero</ion-label>
+            <ion-radio slot="start" value="verdadero"></ion-radio>
+          </ion-item>
+          <ion-item>
+            <ion-label>Falso</ion-label>
+            <ion-radio slot="start" value="falso"></ion-radio>
+          </ion-item>
+        </ion-radio-group>
+      </ng-container>
+
+      <!-- Respuesta corta -->
+      <ng-container *ngIf="question.tipo === 'respuesta_corta'">
+        <ion-textarea placeholder="Tu respuesta..." [(ngModel)]="respuestas[question.id]">
+        </ion-textarea>
+      </ng-container>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-button expand="block" color="success" [disabled]="isSubmitting" (click)="submitAttempt()">
+    <ion-icon name="send-outline" slot="start"></ion-icon>
+    Enviar Respuestas
+  </ion-button>
+
+  <ion-spinner *ngIf="isSubmitting" name="crescent" class="center-spinner"></ion-spinner>
+</ion-content>

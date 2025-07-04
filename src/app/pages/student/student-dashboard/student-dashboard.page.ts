@@ -142,9 +142,14 @@ export class StudentDashboardPage implements OnInit {
     this.router.navigate(['/student/courses-list']);
   }
 
+  navigateToQuiz(){
+        this.router.navigate(['/student/quiz-list']);
+  }
   navigateTo(route: string) {
     this.router.navigate([route]);
   }
+
+  
 
   async logout() {
     const alert = await this.alertCtrl.create({
