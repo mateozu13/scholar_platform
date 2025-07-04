@@ -4,7 +4,7 @@ export interface Chat {
   participants: string[];
   lastMessage?: string;
   lastMessageTimestamp?: firebase.firestore.Timestamp;
-  courseId?: string; // Opcional para saber en qué curso se inició el chat
+  courseId?: string;
 }
 
 export interface Message {
@@ -12,7 +12,8 @@ export interface Message {
   chatId: string;
   senderId: string;
   text: string;
-  timestamp: firebase.firestore.Timestamp;
-  status?: 'sent' | 'delivered' | 'read'; // Añadir este campo
-  readAt?: firebase.firestore.Timestamp; // Nuevo campo para tiempo de lectura
+  timestamp: any;
+  status?: 'sent' | 'delivered' | 'read' | 'queued';
+  readAt?: firebase.firestore.Timestamp;
+  offline?: boolean;
 }

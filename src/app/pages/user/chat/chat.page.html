@@ -7,21 +7,39 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content #content>
+<ion-content (ionScroll)="scrollToBottom()" #content>
+  <!-- Indicador de mensajes pendientes -->
+  <div *ngIf="hasPendingMessages" class="offline-indicator">
+    <ion-icon name="cloud-offline"></ion-icon>
+    <span>Tienes mensajes pendientes de enviar</span>
+  </div>
+
   <div class="chat-container">
     <div
       *ngFor="let message of messages"
       [class.sent]="message.senderId === currentUserId"
       [class.received]="message.senderId !== currentUserId"
+      [class.offline]="message.offline"
     >
       <div class="message">
         <p>{{ message.text }}</p>
         <div class="message-footer">
-          <span class="time"
-            >{{ message.timestamp?.toDate() | date: 'shortTime' }}</span
-          >
+          <span class="time">
+            <ng-container
+              *ngIf="normalizeTimestamp(message.timestamp) as msgDate; else noDate"
+            >
+              {{ msgDate | date:'shortTime' }}
+            </ng-container>
+            <ng-template #noDate>—</ng-template>
+          </span>
+          <!-- Indicador de estado offline -->
+          <span *ngIf="message.offline" class="offline-indicator">
+            <ion-icon name="time-outline"></ion-icon>
+            Enviando...
+          </span>
+          <!-- Estado normal para mensajes enviados -->
           <ion-icon
-            *ngIf="message.senderId === currentUserId"
+            *ngIf="!message.offline && message.senderId === currentUserId"
             [name]="getMessageStatusIcon(message.status)"
           ></ion-icon>
         </div>
