@@ -18,6 +18,7 @@ export class TaskCreatePage implements OnInit {
     descripcion: '',
     fechaEntrega: ''
   };
+  assignments: Assignment[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -26,6 +27,7 @@ export class TaskCreatePage implements OnInit {
 
   ngOnInit() {
     this.courseId = this.route.snapshot.paramMap.get('courseId') || '';
+    this.cargarTareas();
   }
 
   async crearTarea() {
@@ -49,9 +51,40 @@ export class TaskCreatePage implements OnInit {
       await this.taskService.createAssignment(newTask);
       alert('✅ Tarea guardada correctamente');
       this.task = { titulo: '', descripcion: '', fechaEntrega: '' };
+      this.cargarTareas();  // 🔁 Recargar la lista después de guardar
     } catch (error) {
       console.error('❌ Error al guardar tarea:', error);
       alert('Ocurrió un error al guardar la tarea');
+    }
+  }
+
+  async cargarTareas() {
+    try {
+      const snapshot = await firebase.firestore()
+        .collection('assignments')
+        .where('courseId', '==', this.courseId)
+        .orderBy('fechaEntrega')
+        .get();
+
+      this.assignments = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...(doc.data() as Assignment)
+      }));
+    } catch (error) {
+      console.error('❌ Error al cargar tareas:', error);
+    }
+  }
+
+  async eliminarTarea(taskId: string) {
+    const confirmar = confirm('¿Seguro que deseas eliminar esta tarea?');
+    if (!confirmar) return;
+
+    try {
+      await firebase.firestore().collection('assignments').doc(taskId).delete();
+      this.assignments = this.assignments.filter(t => t.id !== taskId);
+      alert('🗑️ Tarea eliminada');
+    } catch (error) {
+      console.error('Error al eliminar tarea:', error);
     }
   }
 }

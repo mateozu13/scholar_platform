@@ -9,6 +9,7 @@
 
 <ion-content class="ion-padding">
 
+  <!-- Formulario para crear nuevo quiz -->
   <ion-item>
     <ion-label position="floating">Título del Quiz</ion-label>
     <ion-input [(ngModel)]="titulo"></ion-input>
@@ -89,5 +90,26 @@
 
   <ion-button expand="block" fill="outline" (click)="agregarPregunta()">+ Agregar Pregunta</ion-button>
   <ion-button expand="block" class="ion-margin-top" (click)="guardarQuiz()">Guardar Quiz</ion-button>
+
+  <!-- Lista de quizzes existentes -->
+  <ion-label class="ion-padding-start ion-margin-top" *ngIf="quizzes.length > 0">
+    Quizzes Existentes
+  </ion-label>
+
+  <ion-list *ngIf="quizzes.length > 0">
+    <ion-item *ngFor="let quiz of quizzes">
+      <ion-label>
+        <h2>{{ quiz.titulo }}</h2>
+        <p>{{ quiz.descripcion }}</p>
+        <p><strong>Fecha de cierre:</strong> {{ quiz.fechaCierre | date: 'shortDate' }}</p>
+        <p><strong>Puntos totales:</strong> {{ quiz.puntosTotales }}</p>
+      </ion-label>
+      <ion-button fill="clear" color="danger" (click)="eliminarQuiz(quiz.id)">
+        Eliminar
+      </ion-button>
+    </ion-item>
+  </ion-list>
+
+  <ion-spinner *ngIf="isLoading" name="dots" class="ion-margin-top"></ion-spinner>
 
 </ion-content>

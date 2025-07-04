@@ -25,23 +25,29 @@ export class QuizService {
   }
 
   // Obtener pruebas por curso
-  getTestsByCourse(courseId: string) {
-    return new Promise<Test[]>((resolve, reject) => {
-      this.firestore
-        .collection(this.testsCollection)
-        .where('courseId', '==', courseId)
-        .orderBy('fechaCierre')
-        .get()
-        .then((snapshot) => {
-          const data = snapshot.docs.map((doc) => ({
+getTestsByCourse(courseId: string): Promise<any[]> {
+  return new Promise((resolve, reject) => {
+    this.firestore
+      .collection(this.testsCollection)
+      .where('courseId', '==', courseId)
+      .orderBy('fechaCierre')
+      .get()
+      .then((snapshot) => {
+        const data = snapshot.docs.map((doc) => {
+          const quiz = doc.data();
+          return {
             id: doc.id,
-            ...(doc.data() as Test),
-          }));
-          resolve(data);
-        })
-        .catch(reject);
-    });
-  }
+            ...quiz,
+            fechaCierre: quiz.fechaCierre?.toDate ? quiz.fechaCierre.toDate() : quiz.fechaCierre
+          };
+        });
+        resolve(data);
+      })
+      .catch(reject);
+  });
+}
+
+
 
   // Obtener prueba por ID
   async getTestById(testId: string): Promise<Test | null> {

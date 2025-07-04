@@ -35,4 +35,28 @@
       Guardar Tarea
     </ion-button>
   </form>
+
+<ion-list *ngIf="assignments.length > 0">
+  <ion-list-header>
+    <ion-label>Tareas Existentes</ion-label>
+  </ion-list-header>
+
+  <ion-item *ngFor="let tarea of assignments">
+    <ion-label>
+      <h2>{{ tarea.titulo }}</h2>
+      <p>{{ tarea.descripcion }}</p>
+       <p><strong>Fecha de entrega:</strong> {{ task.fechaEntrega | date: 'shortDate' }}</p>
+    </ion-label>
+    <ion-button fill="clear" color="danger" (click)="eliminarTarea(tarea.id)">
+      Eliminar
+    </ion-button>
+  </ion-item>
+</ion-list>
+
+<div *ngIf="assignments.length === 0" class="ion-text-center">
+  <p>No hay tareas aún</p>
+</div>
+
+
 </ion-content>
+
