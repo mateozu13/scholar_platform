@@ -3,7 +3,7 @@
     <ion-buttons slot="start">
       <ion-menu-button></ion-menu-button>
     </ion-buttons>
-    <ion-title>Dashboard de Estudiante</ion-title>
+    <ion-title>SCHOLAR PLATFORM</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="navigateToProfile()">
         <ion-icon slot="icon-only" name="person-circle-outline"></ion-icon>
@@ -16,136 +16,65 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-  <div class="welcome-section" *ngIf="currentUser">
-    <h3>Bienvenido, {{currentUser.nombre}}</h3>
-    <p>Tu progreso académico en un solo lugar</p>
+  <div *ngIf="currentUser" class="welcome-section">
+    <h3>Hola, {{ currentUser.nombre }}</h3>
+    <p>Revisa tu avance académico y accede a tus recursos</p>
   </div>
 
   <ion-refresher slot="fixed" (ionRefresh)="loadData()">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <!-- Resumen de progreso -->
+  <!-- Accesos rápidos -->
+  <ion-grid>
+    <ion-row>
+      <ion-col size="6">
+        <ion-button expand="block" color="secondary" (click)="navigateToCourse()">
+          <ion-icon name="book-outline" slot="start"></ion-icon>
+          Mis Cursos
+        </ion-button>
+      </ion-col>
+      <ion-col size="6">
+        <ion-button expand="block" color="warning" (click)="navigateTo('/student/task-list')">
+          <ion-icon name="document-text-outline" slot="start"></ion-icon>
+          Tareas Pendientes
+        </ion-button>
+      </ion-col>
+    </ion-row>
+    <ion-row>
+      <ion-col size="6">
+        <ion-button expand="block" color="tertiary" (click)="navigateTo('/student/upcoming-tasks')">
+          <ion-icon name="calendar-outline" slot="start"></ion-icon>
+          Próximas Entregas
+        </ion-button>
+      </ion-col>
+      <ion-col size="6">
+        <ion-button expand="block" color="medium" (click)="navigateTo('/student/recommendations')">
+          <ion-icon name="bulb-outline" slot="start"></ion-icon>
+          Recomendaciones
+        </ion-button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <!-- Progreso por curso -->
   <ion-card>
     <ion-card-header>
       <ion-card-title>Progreso Académico</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <div class="chart-container">
-        <canvas id="progressChart"></canvas>
-      </div>
+      <canvas id="progressChart"></canvas>
     </ion-card-content>
   </ion-card>
 
-  <!-- Tareas pendientes -->
-  <ion-card *ngIf="pendingAssignments.length > 0">
+  <!-- Estado de tareas -->
+  <ion-card>
     <ion-card-header>
-      <ion-card-title>Tareas Pendientes</ion-card-title>
+      <ion-card-title>Estado de Tareas</ion-card-title>
     </ion-card-header>
     <ion-card-content>
-      <ion-list>
-        <ion-item
-          *ngFor="let assignment of pendingAssignments"
-          (click)="navigateToAssignment(assignment.id)"
-        >
-          <ion-label>
-            <h2>{{assignment.titulo}}</h2>
-            <p>{{assignment.courseTitle}}</p>
-            <p>
-              <ion-icon name="calendar-outline"></ion-icon>
-              Entrega: {{formatDate(assignment.fechaEntrega)}}
-              <ion-badge
-                [color]="getUrgencyClass(getDaysLeft(assignment.fechaEntrega))"
-              >
-                {{getDaysLeft(assignment.fechaEntrega)}}
-              </ion-badge>
-            </p>
-          </ion-label>
-        </ion-item>
-      </ion-list>
+      <canvas id="statusChart"></canvas>
     </ion-card-content>
   </ion-card>
 
-  <!-- Próximas fechas límite -->
-  <ion-card *ngIf="upcomingDeadlines.length > 0">
-    <ion-card-header>
-      <ion-card-title>Próximas Fechas Límite</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-list>
-        <ion-item
-          *ngFor="let deadline of upcomingDeadlines"
-          (click)="navigateToAssignment(deadline.id)"
-        >
-          <ion-label>
-            <h2>{{deadline.titulo}}</h2>
-            <p>{{deadline.courseTitle}}</p>
-            <p>
-              <ion-icon name="calendar-outline"></ion-icon>
-              Entrega: {{formatDate(deadline.fechaEntrega)}}
-              <ion-badge
-                [color]="getUrgencyClass(getDaysLeft(deadline.fechaEntrega))"
-              >
-                {{getDaysLeft(deadline.fechaEntrega)}}
-              </ion-badge>
-            </p>
-          </ion-label>
-        </ion-item>
-      </ion-list>
-    </ion-card-content>
-  </ion-card>
-
-  <!-- Cursos inscritos -->
-  <ion-card *ngIf="enrolledCourses.length > 0">
-    <ion-card-header>
-      <ion-card-title>Tus Cursos</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <ion-grid>
-        <ion-row>
-          <ion-col
-            size="12"
-            size-md="6"
-            size-lg="4"
-            *ngFor="let course of enrolledCourses"
-          >
-            <ion-card class="course-card" (click)="navigateToCourse(course.id)">
-              <div class="course-thumbnail">
-                <img
-                  *ngIf="course.imagenUrl"
-                  [src]="course.imagenUrl"
-                  alt="Course thumbnail"
-                />
-                <div *ngIf="!course.imagenUrl" class="thumbnail-fallback">
-                  {{course.titulo | slice:0:1}}
-                </div>
-              </div>
-              <ion-card-header>
-                <ion-card-title>{{course.titulo}}</ion-card-title>
-                <ion-card-subtitle>{{course.profesorNombre}}</ion-card-subtitle>
-              </ion-card-header>
-              <ion-card-content>
-                <p>{{course.descripcion | slice:0:80}}...</p>
-                <ion-progress-bar
-                  [value]="0.75"
-                  color="primary"
-                ></ion-progress-bar>
-                <ion-note>75% completado</ion-note>
-              </ion-card-content>
-            </ion-card>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
-    </ion-card-content>
-  </ion-card>
-
-  <!-- Estado vacío -->
-  <div *ngIf="!isLoading && enrolledCourses.length === 0" class="empty-state">
-    <ion-icon name="book-outline"></ion-icon>
-    <h3>Aún no estás inscrito en ningún curso</h3>
-    <p>Explora nuestros cursos y comienza tu aprendizaje</p>
-    <ion-button fill="outline" routerLink="/courses"
-      >Explorar Cursos</ion-button
-    >
-  </div>
 </ion-content>

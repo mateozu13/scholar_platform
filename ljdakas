@@ -1,0 +1,790 @@
+[1mdiff --git a/package-lock.json b/package-lock.json[m
+[1mindex 7c7dfb4..4ffe54b 100644[m
+[1m--- a/package-lock.json[m
+[1m+++ b/package-lock.json[m
+[36m@@ -8357,7 +8357,7 @@[m
+       "version": "4.0.3",[m
+       "resolved": "https://registry.npmjs.org/chokidar/-/chokidar-4.0.3.tgz",[m
+       "integrity": "sha512-Qgzu8kfBvo+cA4962jnP1KkS6Dop5NS6g7R5LFYJr4b8Ub94PPQXUksCw9PvXoeXPRRddRNC5C1JQUR2SMGtnA==",[m
+[31m-      "dev": true,[m
+[32m+[m[32m      "devOptional": true,[m
+       "dependencies": {[m
+         "readdirp": "^4.0.1"[m
+       },[m
+[36m@@ -14769,7 +14769,7 @@[m
+       "version": "4.1.2",[m
+       "resolved": "https://registry.npmjs.org/readdirp/-/readdirp-4.1.2.tgz",[m
+       "integrity": "sha512-GDhwkLfywWL2s6vEjyhri+eXmfH6j1L7JE27WhqLeYzoh/A3DBaYGEj2H/HFZCn/kMfim73FXxEJTw06WtxQwg==",[m
+[31m-      "dev": true,[m
+[32m+[m[32m      "devOptional": true,[m
+       "engines": {[m
+         "node": ">= 14.18.0"[m
+       },[m
+[1mdiff --git a/src/app/app-routing.module.ts b/src/app/app-routing.module.ts[m
+[1mindex 05096bf..812c5e3 100644[m
+[1m--- a/src/app/app-routing.module.ts[m
+[1m+++ b/src/app/app-routing.module.ts[m
+[36m@@ -106,111 +106,138 @@[m [mconst routes: Routes = [[m
+             (m) => m.ProfilePageModule[m
+           ),[m
+       },[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: 'courses-list',[m
+[32m+[m[32m        loadChildren: () =>[m
+[32m+[m[32m          import('./pages/student/courses-list/courses-list.module').then(m => m.CoursesListPageModule)[m
+[32m+[m[32m      },[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: 'course-detail',[m
+[32m+[m[32m        loadChildren: () =>[m
+[32m+[m[32m          import('./pages/student/course-detail/course-detail.module').then(m => m.CourseDetailPageModule)[m
+[32m+[m[32m      },[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: 'task-list',[m
+[32m+[m[32m        loadChildren: () =>[m
+[32m+[m[32m          import('./pages/student/task-list/task-list.module').then(m => m.TaskListPageModule)[m
+[32m+[m[32m      },[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: 'task-detail',[m
+[32m+[m[32m        loadChildren: () => import('./pages/student/task-detail/task-detail.module').then(m => m.TaskDetailPageModule)[m
+[32m+[m[32m      },[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: 'chat-list',[m
+[32m+[m[32m        loadChildren: () => import('./pages/student/chat-list/chat-list.module').then(m => m.ChatListPageModule)[m
+[32m+[m[32m      },[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: 'chat-detail',[m
+[32m+[m[32m        loadChildren: () => import('./pages/student/chat-detail/chat-detail.module').then(m => m.ChatDetailPageModule)[m
+[32m+[m[32m      },[m
+     ],[m
+   },[m
+ [m
+   // TEACHER[m
+   {[m
+[31m-  path: 'teacher',[m
+[31m-  canActivate: [AuthGuard, RoleGuard],[m
+[31m-  data: { expectedRole: 'profesor' },[m
+[31m-  children: [[m
+[31m-    {[m
+[31m-      path: '',[m
+[31m-      redirectTo: 'dashboard',[m
+[31m-      pathMatch: 'full',[m
+[31m-    },[m
+[31m-    {[m
+[31m-      path: 'dashboard',[m
+[31m-      loadChildren: () =>[m
+[31m-        import('./pages/teacher/teacher-dashboard/teacher-dashboard.module').then([m
+[31m-          (m) => m.TeacherDashboardPageModule[m
+[31m-        ),[m
+[31m-    },[m
+[31m-    {[m
+[31m-      path: 'profile',[m
+[31m-      loadChildren: () =>[m
+[31m-        import('./pages/teacher/profile/profile.module').then([m
+[31m-          (m) => m.ProfilePageModule[m
+[31m-        ),[m
+[31m-    },[m
+[31m-    {[m
+[31m-      path: 'courses-list',[m
+[31m-      loadChildren: () =>[m
+[31m-        import('./pages/teacher/courses-list/courses-list.module').then([m
+[31m-          (m) => m.CoursesListPageModule[m
+[31m-        ),[m
+[31m-    },[m
+[31m-    {[m
+[31m-      path: 'course-detail/:courseId',[m
+[31m-      loadChildren: () =>[m
+[31m-        import('./pages/teacher/course-detail/course-detail.module').then([m
+[31m-          (m) => m.CourseDetailPageModule[m
+[31m-        ),[m
+[31m-    },[m
+[31m-    {[m
+[31m-      path: 'material-upload/:courseId',[m
+[31m-      loadChildren: () =>[m
+[31m-        import('./pages/teacher/material-upload/material-upload.module').then([m
+[31m-          (m) => m.MaterialUploadPageModule[m
+[31m-        ),[m
+[31m-    },[m
+[31m-    {[m
+[31m-      path: 'task-create/:courseId',[m
+[31m-      loadChildren: () =>[m
+[31m-        import('./pages/teacher/task-create/task-create.module').then([m
+[31m-          (m) => m.TaskCreatePageModule[m
+[31m-        ),[m
+[31m-    },[m
+[31m-    {[m
+[31m-      path: 'task-detail/:taskId',[m
+[31m-      loadChildren: () =>[m
+[31m-        import('./pages/teacher/task-detail/task-detail.module').then([m
+[31m-          (m) => m.TaskDetailPageModule[m
+[31m-        ),[m
+[31m-    },[m
+[31m-    {[m
+[31m-      path: 'submission-review/:submissionId',[m
+[31m-      loadChildren: () =>[m
+[31m-        import('./pages/teacher/submission-review/submission-review.module').then([m
+[31m-          (m) => m.SubmissionReviewPageModule[m
+[31m-        ),[m
+[31m-    },[m
+[31m-    {[m
+[31m-      path: 'quiz-create/:courseId',[m
+[31m-      loadChildren: () =>[m
+[31m-        import('./pages/teacher/quiz-create/quiz-create.module').then([m
+[31m-          (m) => m.QuizCreatePageModule[m
+[31m-        ),[m
+[31m-    },[m
+[31m-    {[m
+[31m-      path: 'quiz-detail/:quizId',[m
+[31m-      loadChildren: () =>[m
+[31m-        import('./pages/teacher/quiz-detail/quiz-detail.module').then([m
+[31m-          (m) => m.QuizDetailPageModule[m
+[31m-        ),[m
+[31m-    },[m
+[31m-    {[m
+[31m-      path: 'quiz-review/:quizId',[m
+[31m-      loadChildren: () =>[m
+[31m-        import('./pages/teacher/quiz-review/quiz-review.module').then([m
+[31m-          (m) => m.QuizReviewPageModule[m
+[31m-        ),[m
+[31m-    },[m
+[31m-    {[m
+[31m-      path: 'chat-list',[m
+[31m-      loadChildren: () =>[m
+[31m-        import('./pages/teacher/chat-list/chat-list.module').then([m
+[31m-          (m) => m.ChatListPageModule[m
+[31m-        ),[m
+[31m-    },[m
+[31m-    {[m
+[31m-      path: 'chat-detail/:chatId',[m
+[31m-      loadChildren: () =>[m
+[31m-        import('./pages/teacher/chat-detail/chat-detail.module').then([m
+[31m-          (m) => m.ChatDetailPageModule[m
+[31m-        ),[m
+[31m-    },[m
+[32m+[m[32m    path: 'teacher',[m
+[32m+[m[32m    canActivate: [AuthGuard, RoleGuard],[m
+[32m+[m[32m    data: { expectedRole: 'profesor' },[m
+[32m+[m[32m    children: [[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: '',[m
+[32m+[m[32m        redirectTo: 'dashboard',[m
+[32m+[m[32m        pathMatch: 'full',[m
+[32m+[m[32m      },[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: 'dashboard',[m
+[32m+[m[32m        loadChildren: () =>[m
+[32m+[m[32m          import('./pages/teacher/teacher-dashboard/teacher-dashboard.module').then([m
+[32m+[m[32m            (m) => m.TeacherDashboardPageModule[m
+[32m+[m[32m          ),[m
+[32m+[m[32m      },[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: 'profile',[m
+[32m+[m[32m        loadChildren: () =>[m
+[32m+[m[32m          import('./pages/teacher/profile/profile.module').then([m
+[32m+[m[32m            (m) => m.ProfilePageModule[m
+[32m+[m[32m          ),[m
+[32m+[m[32m      },[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: 'courses-list',[m
+[32m+[m[32m        loadChildren: () =>[m
+[32m+[m[32m          import('./pages/teacher/courses-list/courses-list.module').then([m
+[32m+[m[32m            (m) => m.CoursesListPageModule[m
+[32m+[m[32m          ),[m
+[32m+[m[32m      },[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: 'course-detail/:courseId',[m
+[32m+[m[32m        loadChildren: () =>[m
+[32m+[m[32m          import('./pages/teacher/course-detail/course-detail.module').then([m
+[32m+[m[32m            (m) => m.CourseDetailPageModule[m
+[32m+[m[32m          ),[m
+[32m+[m[32m      },[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: 'material-upload/:courseId',[m
+[32m+[m[32m        loadChildren: () =>[m
+[32m+[m[32m          import('./pages/teacher/material-upload/material-upload.module').then([m
+[32m+[m[32m            (m) => m.MaterialUploadPageModule[m
+[32m+[m[32m          ),[m
+[32m+[m[32m      },[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: 'task-create/:courseId',[m
+[32m+[m[32m        loadChildren: () =>[m
+[32m+[m[32m          import('./pages/teacher/task-create/task-create.module').then([m
+[32m+[m[32m            (m) => m.TaskCreatePageModule[m
+[32m+[m[32m          ),[m
+[32m+[m[32m      },[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: 'task-detail/:taskId',[m
+[32m+[m[32m        loadChildren: () =>[m
+[32m+[m[32m          import('./pages/teacher/task-detail/task-detail.module').then([m
+[32m+[m[32m            (m) => m.TaskDetailPageModule[m
+[32m+[m[32m          ),[m
+[32m+[m[32m      },[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: 'submission-review/:submissionId',[m
+[32m+[m[32m        loadChildren: () =>[m
+[32m+[m[32m          import('./pages/teacher/submission-review/submission-review.module').then([m
+[32m+[m[32m            (m) => m.SubmissionReviewPageModule[m
+[32m+[m[32m          ),[m
+[32m+[m[32m      },[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: 'quiz-create/:courseId',[m
+[32m+[m[32m        loadChildren: () =>[m
+[32m+[m[32m          import('./pages/teacher/quiz-create/quiz-create.module').then([m
+[32m+[m[32m            (m) => m.QuizCreatePageModule[m
+[32m+[m[32m          ),[m
+[32m+[m[32m      },[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: 'quiz-detail/:quizId',[m
+[32m+[m[32m        loadChildren: () =>[m
+[32m+[m[32m          import('./pages/teacher/quiz-detail/quiz-detail.module').then([m
+[32m+[m[32m            (m) => m.QuizDetailPageModule[m
+[32m+[m[32m          ),[m
+[32m+[m[32m      },[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: 'quiz-review/:quizId',[m
+[32m+[m[32m        loadChildren: () =>[m
+[32m+[m[32m          import('./pages/teacher/quiz-review/quiz-review.module').then([m
+[32m+[m[32m            (m) => m.QuizReviewPageModule[m
+[32m+[m[32m          ),[m
+[32m+[m[32m      },[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: 'chat-list',[m
+[32m+[m[32m        loadChildren: () =>[m
+[32m+[m[32m          import('./pages/teacher/chat-list/chat-list.module').then([m
+[32m+[m[32m            (m) => m.ChatListPageModule[m
+[32m+[m[32m          ),[m
+[32m+[m[32m      },[m
+[32m+[m[32m      {[m
+[32m+[m[32m        path: 'chat-detail/:chatId',[m
+[32m+[m[32m        loadChildren: () =>[m
+[32m+[m[32m          import('./pages/teacher/chat-detail/chat-detail.module').then([m
+[32m+[m[32m            (m) => m.ChatDetailPageModule[m
+[32m+[m[32m          ),[m
+[32m+[m[32m      },[m
+ [m
+     ],[m
+   },[m
+[36m@@ -221,7 +248,6 @@[m [mconst routes: Routes = [[m
+     redirectTo: 'login',[m
+     pathMatch: 'full',[m
+   },[m
+[31m-  [m
+ [m
+ ];[m
+ [m
+[36m@@ -231,4 +257,4 @@[m [mconst routes: Routes = [[m
+   ],[m
+   exports: [RouterModule],[m
+ })[m
+[31m-export class AppRoutingModule {}[m
+[32m+[m[32mexport class AppRoutingModule { }[m
+\ No newline at end of file[m
+[1mdiff --git a/src/app/pages/student/student-dashboard/student-dashboard.page.html b/src/app/pages/student/student-dashboard/student-dashboard.page.html[m
+[1mindex 1af270d..1d3ab4d 100644[m
+[1m--- a/src/app/pages/student/student-dashboard/student-dashboard.page.html[m
+[1m+++ b/src/app/pages/student/student-dashboard/student-dashboard.page.html[m
+[36m@@ -3,7 +3,7 @@[m
+     <ion-buttons slot="start">[m
+       <ion-menu-button></ion-menu-button>[m
+     </ion-buttons>[m
+[31m-    <ion-title>Dashboard de Estudiante</ion-title>[m
+[32m+[m[32m    <ion-title>SCHOLAR PLATFORM</ion-title>[m
+     <ion-buttons slot="end">[m
+       <ion-button (click)="navigateToProfile()">[m
+         <ion-icon slot="icon-only" name="person-circle-outline"></ion-icon>[m
+[36m@@ -16,136 +16,67 @@[m
+ </ion-header>[m
+ [m
+ <ion-content class="ion-padding">[m
+[31m-  <div class="welcome-section" *ngIf="currentUser">[m
+[31m-    <h3>Bienvenido, {{currentUser.nombre}}</h3>[m
+[31m-    <p>Tu progreso académico en un solo lugar</p>[m
+[32m+[m[32m  <div *ngIf="currentUser" class="welcome-section">[m
+[32m+[m[32m    <h3>Hola, {{ currentUser.nombre }}</h3>[m
+[32m+[m[32m    <p>Revisa tu avance académico y accede a tus recursos</p>[m
+   </div>[m
+ [m
+   <ion-refresher slot="fixed" (ionRefresh)="loadData()">[m
+     <ion-refresher-content></ion-refresher-content>[m
+   </ion-refresher>[m
+ [m
+[31m-  <!-- Resumen de progreso -->[m
+[32m+[m[32m  <!-- Accesos rápidos -->[m
+[32m+[m[32m  <ion-grid>[m
+[32m+[m[32m    <ion-row>[m
+[32m+[m[32m      <ion-col size="6">[m
+[32m+[m[32m        <ion-button expand="block" color="secondary" (click)="navigateTo('/student/courses-list')">[m
+[32m+[m[32m          <ion-icon name="book-outline" slot="start"></ion-icon>[m
+[32m+[m[32m          Mis Cursos[m
+[32m+[m[32m        </ion-button>[m
+[32m+[m[32m      </ion-col>[m
+[32m+[m[32m      <ion-col size="6">[m
+[32m+[m[32m        <ion-button expand="block" color="warning" (click)="navigateTo('/student/task-list')">[m
+[32m+[m[32m          <ion-icon name="document-text-outline" slot="start"></ion-icon>[m
+[32m+[m[32m          Tareas Pendientes[m
+[32m+[m[32m        </ion-button>[m
+[32m+[m[32m      </ion-col>[m
+[32m+[m[32m    </ion-row>[m
+[32m+[m[32m    <ion-row>[m
+[32m+[m[32m      <ion-col size="6">[m
+[32m+[m[32m        <ion-button expand="block" color="tertiary" (click)="navigateTo('/student/upcoming-tasks')">[m
+[32m+[m[32m          <ion-icon name="calendar-outline" slot="start"></ion-icon>[m
+[32m+[m[32m          Próximas Entregas[m
+[32m+[m[32m        </ion-button>[m
+[32m+[m[32m      </ion-col>[m
+[32m+[m[32m      <ion-col size="6">[m
+[32m+[m[32m        <ion-button expand="block" color="medium" (click)="navigateTo('/student/recommendations')">[m
+[32m+[m[32m          <ion-icon name="bulb-outline" slot="start"></ion-icon>[m
+[32m+[m[32m          Recomendaciones[m
+[32m+[m[32m        </ion-button>[m
+[32m+[m[32m      </ion-col>[m
+[32m+[m[32m    </ion-row>[m
+[32m+[m[32m  </ion-grid>[m
+[32m+[m
+[32m+[m[32m  <!-- Progreso por curso -->[m
+[32m+[m
+   <ion-card>[m
+     <ion-card-header>[m
+       <ion-card-title>Progreso Académico</ion-card-title>[m
+     </ion-card-header>[m
+     <ion-card-content>[m
+[31m-      <div class="chart-container">[m
+[31m-        <canvas id="progressChart"></canvas>[m
+[31m-      </div>[m
+[31m-    </ion-card-content>[m
+[31m-  </ion-card>[m
+[31m-[m
+[31m-  <!-- Tareas pendientes -->[m
+[31m-  <ion-card *ngIf="pendingAssignments.length > 0">[m
+[31m-    <ion-card-header>[m
+[31m-      <ion-card-title>Tareas Pendientes</ion-card-title>[m
+[31m-    </ion-card-header>[m
+[31m-    <ion-card-content>[m
+[31m-      <ion-list>[m
+[31m-        <ion-item[m
+[31m-          *ngFor="let assignment of pendingAssignments"[m
+[31m-          (click)="navigateToAssignment(assignment.id)"[m
+[31m-        >[m
+[31m-          <ion-label>[m
+[31m-            <h2>{{assignment.titulo}}</h2>[m
+[31m-            <p>{{assignment.courseTitle}}</p>[m
+[31m-            <p>[m
+[31m-              <ion-icon name="calendar-outline"></ion-icon>[m
+[31m-              Entrega: {{formatDate(assignment.fechaEntrega)}}[m
+[31m-              <ion-badge[m
+[31m-                [color]="getUrgencyClass(getDaysLeft(assignment.fechaEntrega))"[m
+[31m-              >[m
+[31m-                {{getDaysLeft(assignment.fechaEntrega)}}[m
+[31m-              </ion-badge>[m
+[31m-            </p>[m
+[31m-          </ion-label>[m
+[31m-        </ion-item>[m
+[31m-      </ion-list>[m
+[32m+[m[32m      <canvas id="progressChart"></canvas>[m
+     </ion-card-content>[m
+   </ion-card>[m
+ [m
+[31m-  <!-- Próximas fechas límite -->[m
+[31m-  <ion-card *ngIf="upcomingDeadlines.length > 0">[m
+[32m+[m[32m  <!-- Estado de tareas -->[m
+[32m+[m[32m  <ion-card>[m
+     <ion-card-header>[m
+[31m-      <ion-card-title>Próximas Fechas Límite</ion-card-title>[m
+[32m+[m[32m      <ion-card-title>Estado de Tareas</ion-card-title>[m
+     </ion-card-header>[m
+     <ion-card-content>[m
+[31m-      <ion-list>[m
+[31m-        <ion-item[m
+[31m-          *ngFor="let deadline of upcomingDeadlines"[m
+[31m-          (click)="navigateToAssignment(deadline.id)"[m
+[31m-        >[m
+[31m-          <ion-label>[m
+[31m-            <h2>{{deadline.titulo}}</h2>[m
+[31m-            <p>{{deadline.courseTitle}}</p>[m
+[31m-            <p>[m
+[31m-              <ion-icon name="calendar-outline"></ion-icon>[m
+[31m-              Entrega: {{formatDate(deadline.fechaEntrega)}}[m
+[31m-              <ion-badge[m
+[31m-                [color]="getUrgencyClass(getDaysLeft(deadline.fechaEntrega))"[m
+[31m-              >[m
+[31m-                {{getDaysLeft(deadline.fechaEntrega)}}[m
+[31m-              </ion-badge>[m
+[31m-            </p>[m
+[31m-          </ion-label>[m
+[31m-        </ion-item>[m
+[31m-      </ion-list>[m
+[32m+[m[32m      <canvas id="statusChart"></canvas>[m
+     </ion-card-content>[m
+   </ion-card>[m
+ [m
+[31m-  <!-- Cursos inscritos -->[m
+[31m-  <ion-card *ngIf="enrolledCourses.length > 0">[m
+[31m-    <ion-card-header>[m
+[31m-      <ion-card-title>Tus Cursos</ion-card-title>[m
+[31m-    </ion-card-header>[m
+[31m-    <ion-card-content>[m
+[31m-      <ion-grid>[m
+[31m-        <ion-row>[m
+[31m-          <ion-col[m
+[31m-            size="12"[m
+[31m-            size-md="6"[m
+[31m-            size-lg="4"[m
+[31m-            *ngFor="let course of enrolledCourses"[m
+[31m-          >[m
+[31m-            <ion-card class="course-card" (click)="navigateToCourse(course.id)">[m
+[31m-              <div class="course-thumbnail">[m
+[31m-                <img[m
+[31m-                  *ngIf="course.imagenUrl"[m
+[31m-                  [src]="course.imagenUrl"[m
+[31m-                  alt="Course thumbnail"[m
+[31m-                />[m
+[31m-                <div *ngIf="!course.imagenUrl" class="thumbnail-fallback">[m
+[31m-                  {{course.titulo | slice:0:1}}[m
+[31m-                </div>[m
+[31m-              </div>[m
+[31m-              <ion-card-header>[m
+[31m-                <ion-card-title>{{course.titulo}}</ion-card-title>[m
+[31m-                <ion-card-subtitle>{{course.profesorNombre}}</ion-card-subtitle>[m
+[31m-              </ion-card-header>[m
+[31m-              <ion-card-content>[m
+[31m-                <p>{{course.descripcion | slice:0:80}}...</p>[m
+[31m-                <ion-progress-bar[m
+[31m-                  [value]="0.75"[m
+[31m-                  color="primary"[m
+[31m-                ></ion-progress-bar>[m
+[31m-                <ion-note>75% completado</ion-note>[m
+[31m-              </ion-card-content>[m
+[31m-            </ion-card>[m
+[31m-          </ion-col>[m
+[31m-        </ion-row>[m
+[31m-      </ion-grid>[m
+[31m-    </ion-card-content>[m
+[31m-  </ion-card>[m
+ [m
+[31m-  <!-- Estado vacío -->[m
+[31m-  <div *ngIf="!isLoading && enrolledCourses.length === 0" class="empty-state">[m
+[31m-    <ion-icon name="book-outline"></ion-icon>[m
+[31m-    <h3>Aún no estás inscrito en ningún curso</h3>[m
+[31m-    <p>Explora nuestros cursos y comienza tu aprendizaje</p>[m
+[31m-    <ion-button fill="outline" routerLink="/courses"[m
+[31m-      >Explorar Cursos</ion-button[m
+[31m-    >[m
+[31m-  </div>[m
+[31m-</ion-content>[m
+[32m+[m[32m</ion-content>[m
+\ No newline at end of file[m
+[1mdiff --git a/src/app/pages/student/student-dashboard/student-dashboard.page.ts b/src/app/pages/student/student-dashboard/student-dashboard.page.ts[m
+[1mindex 872a983..ade2854 100644[m
+[1m--- a/src/app/pages/student/student-dashboard/student-dashboard.page.ts[m
+[1m+++ b/src/app/pages/student/student-dashboard/student-dashboard.page.ts[m
+[36m@@ -8,13 +8,6 @@[m [mimport { Course } from '../../../models/course.model';[m
+ import { Assignment } from '../../../models/assignment.model';[m
+ import { AlertController, LoadingController } from '@ionic/angular';[m
+ import { Chart, registerables } from 'chart.js';[m
+[31m-import firebase from 'firebase/compat/app';[m
+[31m-import 'firebase/compat/firestore';[m
+[31m-[m
+[31m-type FirestoreTimestampLike = {[m
+[31m-  seconds: number;[m
+[31m-  nanoseconds: number;[m
+[31m-};[m
+ [m
+ @Component({[m
+   selector: 'app-student-dashboard',[m
+[36m@@ -26,10 +19,10 @@[m [mexport class StudentDashboardPage implements OnInit {[m
+   currentUser: User | null = null;[m
+   enrolledCourses: Course[] = [];[m
+   pendingAssignments: Assignment[] = [];[m
+[31m-  recentAssignments: Assignment[] = [];[m
+[32m+[m[32m  upcomingDeadlines: Assignment[] = [];[m
+   progressChart: any;[m
+[32m+[m[32m  statusChart: any;[m
+   isLoading = false;[m
+[31m-  upcomingDeadlines: Assignment[] = [];[m
+ [m
+   constructor([m
+     private router: Router,[m
+[36m@@ -58,32 +51,14 @@[m [mexport class StudentDashboardPage implements OnInit {[m
+     await loading.present();[m
+ [m
+     try {[m
+[31m-      // Obtener usuario actual[m
+       this.currentUser = await this.authService.getCurrentUser();[m
+ [m
+       if (this.currentUser) {[m
+[31m-        // Obtener cursos inscritos[m
+[31m-        this.enrolledCourses = await this.courseService.getCoursesByStudent([m
+[31m-          this.currentUser.id[m
+[31m-        );[m
+[31m-[m
+[31m-        // Obtener tareas pendientes[m
+[31m-        this.pendingAssignments = await this.taskService.getPendingAssignments([m
+[31m-          this.currentUser.id[m
+[31m-        );[m
+[31m-[m
+[31m-        // Obtener tareas recientes (últimas 5)[m
+[31m-        this.recentAssignments = await this.taskService.getRecentAssignments([m
+[31m-          this.currentUser.id[m
+[31m-        );[m
+[31m-[m
+[31m-        // Obtener próximas fechas límite[m
+[31m-        this.upcomingDeadlines = await this.taskService.getUpcomingAssignments([m
+[31m-          this.currentUser.id[m
+[31m-        );[m
+[31m-[m
+[31m-        // Crear gráficos[m
+[32m+[m[32m        this.enrolledCourses = await this.courseService.getCoursesByStudent(this.currentUser.id);[m
+[32m+[m[32m        this.pendingAssignments = await this.taskService.getPendingAssignments(this.currentUser.id);[m
+[32m+[m[32m        this.upcomingDeadlines = await this.taskService.getUpcomingAssignments(this.currentUser.id);[m
+         this.createProgressChart();[m
+[32m+[m[32m        this.createStatusChart();[m
+       }[m
+     } catch (error) {[m
+       console.error('Error al cargar datos:', error);[m
+[36m@@ -100,19 +75,17 @@[m [mexport class StudentDashboardPage implements OnInit {[m
+   }[m
+ [m
+   createProgressChart() {[m
+[31m-    if (this.progressChart) {[m
+[31m-      this.progressChart.destroy();[m
+[31m-    }[m
+[32m+[m[32m    if (this.progressChart) this.progressChart.destroy();[m
+ [m
+     const ctx = document.getElementById('progressChart') as HTMLCanvasElement;[m
+     this.progressChart = new Chart(ctx, {[m
+       type: 'bar',[m
+       data: {[m
+[31m-        labels: this.enrolledCourses.map((course) => course.titulo),[m
+[32m+[m[32m        labels: this.enrolledCourses.map((c) => c.titulo),[m
+         datasets: [[m
+           {[m
+[31m-            label: 'Progreso del curso (%)',[m
+[31m-            data: [75, 60, 90, 45, 80], // Datos simulados[m
+[32m+[m[32m            label: 'Progreso (%)',[m
+[32m+[m[32m            data: this.enrolledCourses.map(() => Math.floor(Math.random() * 50 + 50)), // Simulación[m
+             backgroundColor: 'rgba(54, 162, 235, 0.7)',[m
+             borderColor: 'rgba(54, 162, 235, 1)',[m
+             borderWidth: 1,[m
+[36m@@ -126,9 +99,7 @@[m [mexport class StudentDashboardPage implements OnInit {[m
+             beginAtZero: true,[m
+             max: 100,[m
+             ticks: {[m
+[31m-              callback: function (value) {[m
+[31m-                return value + '%';[m
+[31m-              },[m
+[32m+[m[32m              callback: (value) => value + '%',[m
+             },[m
+           },[m
+         },[m
+[36m@@ -136,75 +107,47 @@[m [mexport class StudentDashboardPage implements OnInit {[m
+     });[m
+   }[m
+ [m
+[31m-  navigateToCourse(courseId: string) {[m
+[31m-    this.router.navigate(['/student/course-detail', courseId]);[m
+[31m-  }[m
+[32m+[m[32m  createStatusChart() {[m
+[32m+[m[32m    if (this.statusChart) this.statusChart.destroy();[m
+ [m
+[31m-  navigateToAssignment(assignmentId: string) {[m
+[31m-    this.router.navigate(['/student/task-detail', assignmentId]);[m
+[32m+[m[32m    const ctx = document.getElementById('statusChart') as HTMLCanvasElement;[m
+[32m+[m[32m    this.statusChart = new Chart(ctx, {[m
+[32m+[m[32m      type: 'doughnut',[m
+[32m+[m[32m      data: {[m
+[32m+[m[32m        labels: ['Pendientes', 'Completadas', 'Vencidas'],[m
+[32m+[m[32m        datasets: [[m
+[32m+[m[32m          {[m
+[32m+[m[32m            data: [this.pendingAssignments.length, 3, 2], // Simulación[m
+[32m+[m[32m            backgroundColor: ['#FFA500', '#28a745', '#dc3545'],[m
+[32m+[m[32m            borderWidth: 1,[m
+[32m+[m[32m          },[m
+[32m+[m[32m        ],[m
+[32m+[m[32m      },[m
+[32m+[m[32m      options: {[m
+[32m+[m[32m        responsive: true,[m
+[32m+[m[32m        plugins: {[m
+[32m+[m[32m          legend: {[m
+[32m+[m[32m            position: 'bottom',[m
+[32m+[m[32m          },[m
+[32m+[m[32m        },[m
+[32m+[m[32m      },[m
+[32m+[m[32m    });[m
+   }[m
+ [m
+   navigateToProfile() {[m
+     this.router.navigate(['/student/profile']);[m
+   }[m
+ [m
+[31m-  formatDate([m
+[31m-    date?: Date | string | firebase.firestore.Timestamp | FirestoreTimestampLike[m
+[31m-  ): string {[m
+[31m-    if (!date) {[m
+[31m-      return 'No definida';[m
+[31m-    }[m
+[31m-[m
+[31m-    let jsDate: Date;[m
+[31m-[m
+[31m-    // 1) Si es Timestamp de compat[m
+[31m-    if (date instanceof firebase.firestore.Timestamp) {[m
+[31m-      jsDate = date.toDate();[m
+[31m-[m
+[31m-      // 2) Si es el objeto literal { seconds, nanoseconds }[m
+[31m-    } else if ([m
+[31m-      typeof date === 'object' &&[m
+[31m-      'seconds' in date &&[m
+[31m-      'nanoseconds' in date[m
+[31m-    ) {[m
+[31m-      const millis = date.seconds * 1000 + Math.floor(date.nanoseconds / 1e6);[m
+[31m-      jsDate = new Date(millis);[m
+[31m-[m
+[31m-      // 3) Si es Date o string ISO[m
+[31m-    } else {[m
+[31m-      jsDate = new Date(date as string | Date);[m
+[31m-    }[m
+[31m-[m
+[31m-    // 4) Comprobar validez[m
+[31m-    if (isNaN(jsDate.getTime())) {[m
+[31m-      return 'No definida';[m
+[31m-    }[m
+[31m-[m
+[31m-    // 5) Formatear[m
+[31m-    return jsDate.toLocaleDateString('es-ES', {[m
+[31m-      year: 'numeric',[m
+[31m-      month: 'short',[m
+[31m-      day: 'numeric',[m
+[31m-    });[m
+[32m+[m[32m  navigateTo(route: string) {[m
+[32m+[m[32m    this.router.navigate([route]);[m
+   }[m
+ [m
+[31m-  getDaysLeft(date: Date | string | undefined): string {[m
+[31m-    if (!date) return '?';[m
+[31m-[m
+[31m-    const dueDate = new Date(date);[m
+[31m-    const today = new Date();[m
+[31m-    const diffTime = dueDate.getTime() - today.getTime();[m
+[31m-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));[m
+[31m-[m
+[31m-    if (diffDays < 0) return 'Vencida';[m
+[31m-    if (diffDays === 0) return 'Hoy';[m
+[31m-    return `${diffDays} días`;[m
+[32m+[m[32m  navigateToCourse(courseId: string) {[m
+[32m+[m[32m    this.router.navigate(['/student/courses-list', courseId]);[m
+   }[m
+ [m
+[31m-  getUrgencyClass(days: string): string {[m
+[31m-    if (days === 'Vencida') return 'danger';[m
+[31m-    if (days === 'Hoy') return 'warning';[m
+[31m-    return 'success';[m
+[32m+[m[32m  navigateToAssignment(assignmentId: string) {[m
+[32m+[m[32m    this.router.navigate(['/student/task-list', assignmentId]);[m
+   }[m
+ [m
+   async logout() {[m
+[36m@@ -212,10 +155,7 @@[m [mexport class StudentDashboardPage implements OnInit {[m
+       header: 'Cerrar sesión',[m
+       message: '¿Estás seguro de que quieres cerrar sesión?',[m
+       buttons: [[m
+[31m-        {[m
+[31m-          text: 'Cancelar',[m
+[31m-          role: 'cancel',[m
+[31m-        },[m
+[32m+[m[32m        { text: 'Cancelar', role: 'cancel' },[m
+         {[m
+           text: 'Cerrar sesión',[m
+           handler: async () => {[m
+[1mdiff --git a/src/app/services/course.service.ts b/src/app/services/course.service.ts[m
+[1mindex aa83e35..e206abb 100644[m
+[1m--- a/src/app/services/course.service.ts[m
+[1m+++ b/src/app/services/course.service.ts[m
+[36m@@ -12,57 +12,40 @@[m [mexport class CourseService {[m
+   private coursesCollection = 'courses';[m
+   private enrollmentsCollection = 'enrollments';[m
+ [m
+[31m-  constructor(private userService: UserService) {}[m
+[32m+[m[32m  constructor(private userService: UserService) { }[m
+ [m
+   // Obtener cursos por estudiante[m
+   async getCoursesByStudent(studentId: string): Promise<Course[]> {[m
+     try {[m
+[31m-      // 1. Obtener todas las inscripciones del estudiante[m
+[31m-      const enrollmentsSnapshot = await this.db[m
+[31m-        .collection(this.enrollmentsCollection)[m
+[31m-        .where('userId', '==', studentId)[m
+[31m-        .get();[m
+[32m+[m[32m      const snapshot = await this.db.collection(this.coursesCollection).get();[m
+ [m
+[31m-      if (enrollmentsSnapshot.empty) {[m
+[31m-        return [];[m
+[31m-      }[m
+[32m+[m[32m      const filteredCourses: Course[] = [];[m
+ [m
+[31m-      // 2. Extraer los IDs de los cursos[m
+[31m-      const courseIds = enrollmentsSnapshot.docs.map([m
+[31m-        (doc) => doc.data().courseId[m
+[31m-      );[m
+[32m+[m[32m      for (const doc of snapshot.docs) {[m
+[32m+[m[32m        const data = doc.data() as Course & { estudiantes?: any[] };[m
+ [m
+[31m-      // 3. Obtener los detalles de los cursos[m
+[31m-      const coursesPromises = courseIds.map(async (courseId) => {[m
+[31m-        const courseDoc = await this.db[m
+[31m-          .collection(this.coursesCollection)[m
+[31m-          .doc(courseId)[m
+[31m-          .get();[m
+[31m-        if (courseDoc.exists) {[m
+[31m-          const courseData = courseDoc.data() as Course;[m
+[31m-[m
+[31m-          // 4. Obtener información del profesor[m
+[31m-          const teacher = await this.userService.getUserById([m
+[31m-            courseData.profesorId[m
+[31m-          );[m
+[31m-          return {[m
+[31m-            id: courseDoc.id,[m
+[31m-            ...courseData,[m
+[32m+[m[32m        const isStudentEnrolled = Array.isArray(data.estudiantes)[m
+[32m+[m[32m          && data.estudiantes.some((e) => e.id === studentId);[m
+[32m+[m
+[32m+[m[32m        if (isStudentEnrolled) {[m
+[32m+[m[32m          const teacher = await this.userService.getUserById(data.profesorId);[m
+[32m+[m
+[32m+[m[32m          filteredCourses.push({[m
+[32m+[m[32m            id: doc.id,[m
+[32m+[m[32m            ...data,[m
+             profesorNombre: teacher?.nombre || 'Profesor desconocido',[m
+[31m-          } as Course;[m
+[32m+[m[32m          } as Course);[m
+         }[m
+[31m-        return null;[m
+[31m-      });[m
+[32m+[m[32m      }[m
+ [m
+[31m-      // 5. Esperar a que todas las promesas se resuelvan y filtrar nulos[m
+[31m-      const courses = await Promise.all(coursesPromises);[m
+[31m-      return courses.filter((course) => course !== null) as Course[];[m
+[32m+[m[32m      return filteredCourses;[m
+     } catch (error) {[m
+       console.error('Error al obtener cursos del estudiante:', error);[m
+       throw error;[m
+     }[m
+   }[m
+ [m
+[32m+[m
+   // Obtener cursos por profesor[m
+   async getCoursesByTeacher(teacherId: string): Promise<Course[]> {[m
+     try {[m
+[36m@@ -120,10 +103,10 @@[m [mexport class CourseService {[m
+       const snapshot = await this.db.collection(this.coursesCollection).get();[m
+       return snapshot.docs.map([m
+         (doc) =>[m
+[31m-          ({[m
+[31m-            id: doc.id,[m
+[31m-            ...doc.data(),[m
+[31m-          } as Course)[m
+[32m+[m[32m        ({[m
+[32m+[m[32m          id: doc.id,[m
+[32m+[m[32m          ...doc.data(),[m
+[32m+[m[32m        } as Course)[m
+       );[m
+     } catch (error) {[m
+       console.error('Error al obtener todos los cursos:', error);[m

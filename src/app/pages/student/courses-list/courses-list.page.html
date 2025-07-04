@@ -1,0 +1,65 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/student/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Mis Cursos</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-refresher slot="fixed" (ionRefresh)="loadCourses($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Lista de cursos -->
+  <ion-card *ngIf="enrolledCourses.length > 0">
+    <ion-card-header>
+      <ion-card-title>Cursos Inscritos</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col
+            size="12"
+            size-md="6"
+            size-lg="4"
+            *ngFor="let course of enrolledCourses"
+          >
+            <ion-card class="course-card" (click)="navigateToCourse(course.id)">
+              <div class="course-thumbnail">
+                <img
+                  *ngIf="course.imagenUrl"
+                  [src]="course.imagenUrl"
+                  alt="Miniatura del curso"
+                />
+                <div *ngIf="!course.imagenUrl" class="thumbnail-fallback">
+                  {{ course.titulo | slice:0:1 }}
+                </div>
+              </div>
+              <ion-card-header>
+                <ion-card-title>{{ course.titulo }}</ion-card-title>
+                <ion-card-subtitle>{{ course.profesorNombre }}</ion-card-subtitle>
+              </ion-card-header>
+              <ion-card-content>
+                <p>{{ course.descripcion | slice: 0:80 }}...</p>
+                <ion-progress-bar [value]="0.75" color="primary"></ion-progress-bar>
+                <ion-note>75% completado</ion-note>
+              </ion-card-content>
+            </ion-card>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Cargando -->
+  <ion-spinner *ngIf="isLoading" class="ion-padding" name="crescent"></ion-spinner>
+
+  <!-- Si no está inscrito en ningún curso -->
+  <div *ngIf="!isLoading && enrolledCourses.length === 0" class="empty-state">
+    <ion-icon name="book-outline"></ion-icon>
+    <h3>Aún no estás inscrito en ningún curso</h3>
+    <p>Contacta a tu profesor o revisa la plataforma</p>
+  </div>
+</ion-content>

@@ -1,0 +1,19 @@
+ion-card-title {
+  font-size: 1.3rem;
+  font-weight: bold;
+}
+
+ion-card-subtitle {
+  font-size: 1rem;
+  color: var(--ion-color-medium);
+}
+
+ion-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 8px;
+}
+
+ion-note {
+  font-size: 0.95rem;
+}

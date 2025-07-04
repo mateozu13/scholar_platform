@@ -106,111 +106,142 @@ const routes: Routes = [
             (m) => m.ProfilePageModule
           ),
       },
+      {
+        path: 'courses-list',
+        loadChildren: () => import('./pages/student/courses-list/courses-list.module').then(m => m.CoursesListPageModule)
+      },
+
+      {
+        path: 'task-list',
+        loadChildren: () =>
+          import('./pages/student/task-list/task-list.module').then(
+            (m) => m.TaskListPageModule
+          ),
+      },
+      {
+        path: 'course-detail/:courseId',
+        loadChildren: () =>
+          import('./pages/student/course-detail/course-detail.module').then(
+            (m) => m.CourseDetailPageModule
+          ),
+      },
+      {
+        path: 'task-detail/:taskId',
+        loadChildren: () =>
+          import('./pages/student/task-detail/task-detail.module').then(
+            (m) => m.TaskDetailPageModule
+          ),
+      },
+      {
+        path: 'task-submit/:taskId',
+        loadChildren: () => import('./pages/student/task-submit/task-submit.module').then(m => m.TaskSubmitPageModule)
+      },
+
     ],
   },
 
   // TEACHER
   {
-  path: 'teacher',
-  canActivate: [AuthGuard, RoleGuard],
-  data: { expectedRole: 'profesor' },
-  children: [
-    {
-      path: '',
-      redirectTo: 'dashboard',
-      pathMatch: 'full',
-    },
-    {
-      path: 'dashboard',
-      loadChildren: () =>
-        import('./pages/teacher/teacher-dashboard/teacher-dashboard.module').then(
-          (m) => m.TeacherDashboardPageModule
-        ),
-    },
-    {
-      path: 'profile',
-      loadChildren: () =>
-        import('./pages/teacher/profile/profile.module').then(
-          (m) => m.ProfilePageModule
-        ),
-    },
-    {
-      path: 'courses-list',
-      loadChildren: () =>
-        import('./pages/teacher/courses-list/courses-list.module').then(
-          (m) => m.CoursesListPageModule
-        ),
-    },
-    {
-      path: 'course-detail/:courseId',
-      loadChildren: () =>
-        import('./pages/teacher/course-detail/course-detail.module').then(
-          (m) => m.CourseDetailPageModule
-        ),
-    },
-    {
-      path: 'material-upload/:courseId',
-      loadChildren: () =>
-        import('./pages/teacher/material-upload/material-upload.module').then(
-          (m) => m.MaterialUploadPageModule
-        ),
-    },
-    {
-      path: 'task-create/:courseId',
-      loadChildren: () =>
-        import('./pages/teacher/task-create/task-create.module').then(
-          (m) => m.TaskCreatePageModule
-        ),
-    },
-    {
-      path: 'task-detail/:taskId',
-      loadChildren: () =>
-        import('./pages/teacher/task-detail/task-detail.module').then(
-          (m) => m.TaskDetailPageModule
-        ),
-    },
-    {
-      path: 'submission-review/:submissionId',
-      loadChildren: () =>
-        import('./pages/teacher/submission-review/submission-review.module').then(
-          (m) => m.SubmissionReviewPageModule
-        ),
-    },
-    {
-      path: 'quiz-create/:courseId',
-      loadChildren: () =>
-        import('./pages/teacher/quiz-create/quiz-create.module').then(
-          (m) => m.QuizCreatePageModule
-        ),
-    },
-    {
-      path: 'quiz-detail/:quizId',
-      loadChildren: () =>
-        import('./pages/teacher/quiz-detail/quiz-detail.module').then(
-          (m) => m.QuizDetailPageModule
-        ),
-    },
-    {
-      path: 'quiz-review/:quizId',
-      loadChildren: () =>
-        import('./pages/teacher/quiz-review/quiz-review.module').then(
-          (m) => m.QuizReviewPageModule
-        ),
-    },
-    {
-      path: 'chat-list',
-      loadChildren: () =>
-        import('./pages/teacher/chat-list/chat-list.module').then(
-          (m) => m.ChatListPageModule
-        ),
-    },
-    {
-      path: 'chat-detail/:chatId',
-      loadChildren: () =>
-        import('./pages/teacher/chat-detail/chat-detail.module').then(
-          (m) => m.ChatDetailPageModule
-        ),
-    },
+    path: 'teacher',
+    canActivate: [AuthGuard, RoleGuard],
+    data: { expectedRole: 'profesor' },
+    children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full',
+      },
+      {
+        path: 'dashboard',
+        loadChildren: () =>
+          import('./pages/teacher/teacher-dashboard/teacher-dashboard.module').then(
+            (m) => m.TeacherDashboardPageModule
+          ),
+      },
+      {
+        path: 'profile',
+        loadChildren: () =>
+          import('./pages/teacher/profile/profile.module').then(
+            (m) => m.ProfilePageModule
+          ),
+      },
+      {
+        path: 'courses-list',
+        loadChildren: () =>
+          import('./pages/teacher/courses-list/courses-list.module').then(
+            (m) => m.CoursesListPageModule
+          ),
+      },
+      {
+        path: 'course-detail/:courseId',
+        loadChildren: () =>
+          import('./pages/teacher/course-detail/course-detail.module').then(
+            (m) => m.CourseDetailPageModule
+          ),
+      },
+      {
+        path: 'material-upload/:courseId',
+        loadChildren: () =>
+          import('./pages/teacher/material-upload/material-upload.module').then(
+            (m) => m.MaterialUploadPageModule
+          ),
+      },
+      {
+        path: 'task-create/:courseId',
+        loadChildren: () =>
+          import('./pages/teacher/task-create/task-create.module').then(
+            (m) => m.TaskCreatePageModule
+          ),
+      },
+      {
+        path: 'task-detail/:taskId',
+        loadChildren: () =>
+          import('./pages/teacher/task-detail/task-detail.module').then(
+            (m) => m.TaskDetailPageModule
+          ),
+      },
+      {
+        path: 'submission-review/:submissionId',
+        loadChildren: () =>
+          import('./pages/teacher/submission-review/submission-review.module').then(
+            (m) => m.SubmissionReviewPageModule
+          ),
+      },
+      {
+        path: 'quiz-create/:courseId',
+        loadChildren: () =>
+          import('./pages/teacher/quiz-create/quiz-create.module').then(
+            (m) => m.QuizCreatePageModule
+          ),
+      },
+      {
+        path: 'quiz-detail/:quizId',
+        loadChildren: () =>
+          import('./pages/teacher/quiz-detail/quiz-detail.module').then(
+            (m) => m.QuizDetailPageModule
+          ),
+      },
+      {
+        path: 'quiz-review/:quizId',
+        loadChildren: () =>
+          import('./pages/teacher/quiz-review/quiz-review.module').then(
+            (m) => m.QuizReviewPageModule
+          ),
+      },
+      {
+        path: 'chat-list',
+        loadChildren: () =>
+          import('./pages/teacher/chat-list/chat-list.module').then(
+            (m) => m.ChatListPageModule
+          ),
+      },
+      {
+        path: 'chat-detail/:chatId',
+        loadChildren: () =>
+          import('./pages/teacher/chat-detail/chat-detail.module').then(
+            (m) => m.ChatDetailPageModule
+          ),
+      },
 
     ],
   },
@@ -221,7 +252,6 @@ const routes: Routes = [
     redirectTo: 'login',
     pathMatch: 'full',
   },
-  
 
 ];
 
@@ -231,4 +261,4 @@ const routes: Routes = [
   ],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }
