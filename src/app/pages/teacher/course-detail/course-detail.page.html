@@ -107,64 +107,6 @@
           <ion-label>🧪 Ver Pruebas</ion-label>
         </ion-item>
 
-<ion-accordion-group>
-  <ion-accordion value="pruebas">
-    <ion-item slot="header" color="light">
-      <ion-label>🧪 Ver Pruebas</ion-label>
-    </ion-item>
-
-    <div class="ion-padding" slot="content">
-      <ion-card *ngFor="let quiz of quizzes">
-        <ion-card-header>
-          <ion-card-title>{{ quiz.titulo }}</ion-card-title>
-          <p><strong>Fecha de cierre:</strong> {{ parseDate(quiz.fechaCierre) | date:'short' }}</p>
-        </ion-card-header>
-
-        <ion-card-content>
-          <ion-list *ngIf="quizResultsByQuiz[quiz.id]?.length > 0; else noResults">
-            <ion-item *ngFor="let result of quizResultsByQuiz[quiz.id]">
-              <ion-label>
-                <p><strong>Estudiante:</strong> {{ result.studentName }}</p>
-                <p>Nota: {{ result.score ?? 'No calificado' }}</p>
-
-                <p *ngIf="result.retroalimentacion">💬 {{ result.retroalimentacion }}</p>
-              </ion-label>
-            </ion-item>
-          </ion-list>
-          <ng-template #noResults>
-            <p class="ion-text-center">No hay resultados registrados aún.</p>
-          </ng-template>
-
-
-          <ion-button fill="clear" color="primary" (click)="togglePreguntas(quiz.id)">
-  Ver
-</ion-button>
-
-<div *ngIf="quiz.id === quizExpandido">
-  <ion-list>
-    <ion-item *ngFor="let pregunta of preguntasPorQuiz[quiz.id]">
-      <ion-label>
-        <h3>{{ pregunta.texto }}</h3>
-        <p *ngIf="pregunta.tipo === 'opcion_multiple'">Opciones: 
-          <span *ngFor="let opt of pregunta.opciones; let i = index">
-            {{ i + 1 }}. {{ opt.texto }}{{ i < pregunta.opciones.length - 1 ? ', ' : '' }}
-          </span>
-        </p>
-        <p>Respuesta: {{ pregunta.respuestaCorrecta }}</p>
-        <p>Puntaje: {{ pregunta.puntaje }}</p>
-      </ion-label>
-    </ion-item>
-  </ion-list>
-</div>
-
-
-
-        </ion-card-content>
-      </ion-card>
-    </div>
-  </ion-accordion>
-</ion-accordion-group>
-
         <div class="ion-padding" slot="content">
           <ion-card *ngFor="let quiz of quizzes">
             <ion-card-header>
@@ -182,13 +124,46 @@
                 <ion-item *ngFor="let result of quizResultsByQuiz[quiz.id]">
                   <ion-label>
                     <p><strong>Estudiante:</strong> {{ result.studentName }}</p>
-                    <p>Nota: {{ result.nota ?? 'No calificado' }}</p>
+                    <p>Nota: {{ result.score ?? 'No calificado' }}</p>
+
                     <p *ngIf="result.retroalimentacion">
                       💬 {{ result.retroalimentacion }}
                     </p>
                   </ion-label>
                 </ion-item>
               </ion-list>
+
+              <!-- Botón "Ver" SIEMPRE visible -->
+              <ion-button
+                fill="clear"
+                color="primary"
+                (click)="togglePreguntas(quiz.id)"
+              >
+                Ver
+              </ion-button>
+
+              <!-- Preguntas expandibles -->
+              <div *ngIf="quiz.id === quizExpandido">
+                <ion-list>
+                  <ion-item *ngFor="let pregunta of preguntasPorQuiz[quiz.id]">
+                    <ion-label>
+                      <h3>{{ pregunta.texto }}</h3>
+                      <p *ngIf="pregunta.tipo === 'opcion_multiple'">
+                        Opciones:
+                        <span
+                          *ngFor="let opt of pregunta.opciones; let i = index"
+                        >
+                          {{ i + 1 }}. {{ opt.texto }}{{ i <
+                          pregunta.opciones.length - 1 ? ', ' : '' }}
+                        </span>
+                      </p>
+                      <p>Respuesta: {{ pregunta.respuestaCorrecta }}</p>
+                      <p>Puntaje: {{ pregunta.puntaje }}</p>
+                    </ion-label>
+                  </ion-item>
+                </ion-list>
+              </div>
+
               <ng-template #noResults>
                 <p class="ion-text-center">
                   No hay resultados registrados aún.
