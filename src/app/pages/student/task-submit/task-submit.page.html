@@ -1,0 +1,71 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/student/task-detail/{{ assignmentId }}"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Enviar Tarea</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Detalle de la tarea -->
+  <ion-card *ngIf="assignment">
+    <ion-card-header>
+      <ion-card-title>{{ assignment.titulo }}</ion-card-title>
+      <ion-card-subtitle>
+        Fecha de entrega: {{ formatDate(assignment.fechaEntrega) }}
+      </ion-card-subtitle>
+    </ion-card-header>
+    <ion-card-content>
+      {{ assignment.descripcion }}
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Subida del archivo -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Sube tu archivo</ion-card-title>
+      <ion-card-subtitle>Asegúrate de que sea el archivo correcto</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+      <div class="upload-container">
+        <input
+          type="file"
+          hidden
+          #fileInput
+          (change)="onFileSelected($event)"
+          accept=".pdf,.doc,.docx,.zip,.jpg,.png"
+        />
+        <ion-button expand="block" (click)="fileInput.click()" color="tertiary">
+          <ion-icon slot="start" name="cloud-upload-outline"></ion-icon>
+          Seleccionar archivo
+        </ion-button>
+
+        <div *ngIf="selectedFile" class="file-info">
+          <ion-label>
+            <strong>Archivo:</strong> {{ selectedFile.name }}
+          </ion-label>
+          <ion-button fill="clear" color="danger" size="small" (click)="clearFile()">
+            <ion-icon name="trash-outline"></ion-icon>
+          </ion-button>
+        </div>
+      </div>
+
+      <ion-button
+        expand="block"
+        color="success"
+        [disabled]="!selectedFile || isSubmitting"
+        (click)="submitTask()"
+      >
+        Enviar Tarea
+      </ion-button>
+
+      <ion-button expand="block" color="medium" fill="outline" (click)="cancel()">
+        Cancelar
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-spinner *ngIf="isSubmitting" name="crescent" class="center-spinner"></ion-spinner>
+</ion-content>

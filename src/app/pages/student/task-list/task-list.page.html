@@ -1,0 +1,111 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/student/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Tareas</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-refresher slot="fixed" (ionRefresh)="loadTasks($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <!-- Tareas pendientes -->
+  <ion-card *ngIf="pendingAssignments.length > 0">
+    <ion-card-header>
+      <ion-card-title>Tareas Pendientes</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item
+          *ngFor="let assignment of pendingAssignments"
+          (click)="navigateToAssignment(assignment.id)"
+        >
+          <ion-label>
+            <h2>{{ assignment.titulo }}</h2>
+            <p>{{ assignment.courseTitle }}</p>
+            <p>
+              <ion-icon name="calendar-outline"></ion-icon>
+              Entrega: {{ formatDate(assignment.fechaEntrega) }}
+              <ion-badge
+                [color]="getUrgencyClass(getDaysLeft(assignment.fechaEntrega))"
+              >
+                {{ getDaysLeft(assignment.fechaEntrega) }}
+              </ion-badge>
+            </p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Próximas fechas límite -->
+  <ion-card *ngIf="upcomingDeadlines.length > 0">
+    <ion-card-header>
+      <ion-card-title>Próximas Fechas Límite</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-list>
+        <ion-item
+          *ngFor="let deadline of upcomingDeadlines"
+          (click)="navigateToAssignment(deadline.id)"
+        >
+          <ion-label>
+            <h2>{{ deadline.titulo }}</h2>
+            <p>{{ deadline.courseTitle }}</p>
+            <p>
+              <ion-icon name="calendar-outline"></ion-icon>
+              Entrega: {{ formatDate(deadline.fechaEntrega) }}
+              <ion-badge
+                [color]="getUrgencyClass(getDaysLeft(deadline.fechaEntrega))"
+              >
+                {{ getDaysLeft(deadline.fechaEntrega) }}
+              </ion-badge>
+            </p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+
+  <ion-card *ngIf="pendingAssignments.length > 0 || upcomingDeadlines.length > 0">
+  <ion-card-header>
+    <ion-card-title>Calendario de Tareas</ion-card-title>
+  </ion-card-header>
+  <ion-card-content>
+    <ion-datetime
+      presentation="date"
+      (ionChange)="onDateSelected($event)"
+      [value]="selectedDate"
+    ></ion-datetime>
+
+    <ion-list *ngIf="tasksOnSelectedDate.length > 0">
+      <ion-item *ngFor="let task of tasksOnSelectedDate">
+        <ion-label>
+          <h2>{{ task.titulo }}</h2>
+          <p>{{ task.courseTitle }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-note *ngIf="tasksOnSelectedDate.length === 0">
+      No hay tareas asignadas para esta fecha.
+    </ion-note>
+  </ion-card-content>
+</ion-card>
+
+
+  <!-- Si no hay tareas -->
+  <div
+    *ngIf="!isLoading && pendingAssignments.length === 0 && upcomingDeadlines.length === 0"
+    class="empty-state"
+  >
+    <ion-icon name="checkmark-circle-outline"></ion-icon>
+    <h3>No tienes tareas pendientes</h3>
+    <p>¡Disfruta tu tiempo libre o adelanta tus estudios!</p>
+  </div>
+
+  <ion-spinner *ngIf="isLoading" name="crescent" class="ion-padding"></ion-spinner>
+</ion-content>

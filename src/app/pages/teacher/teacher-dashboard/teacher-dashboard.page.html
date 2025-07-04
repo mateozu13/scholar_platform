@@ -7,11 +7,6 @@
     <ion-title>Dashboard de Profesor</ion-title>
 
     <ion-buttons slot="end">
-      <!-- Botón de mensaje -->
-      <ion-button routerLink="/teacher/chat-list">
-        <ion-icon slot="icon-only" name="chatbubble-ellipses-outline"></ion-icon>
-      </ion-button>
-
       <!-- Botón de perfil -->
       <ion-button (click)="navigateToProfile()">
         <ion-icon slot="icon-only" name="person-circle-outline"></ion-icon>
@@ -24,7 +19,6 @@
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
-
 
 <ion-content class="ion-padding">
   <div class="welcome-section" *ngIf="currentUser">
@@ -152,8 +146,6 @@
     </ion-card-content>
   </ion-card>
 
-  
-
   <!-- Tus cursos -->
   <ion-card *ngIf="taughtCourses.length > 0">
     <ion-card-header>
@@ -199,7 +191,26 @@
     </ion-card-content>
   </ion-card>
 
- 
+<!-- <ion-content class="ion-padding">
+  <ion-card button routerLink="/teacher/chat-list">
+    <ion-card-header>
+      <ion-card-title>📩 Ver Chats</ion-card-title>
+    </ion-card-header>
+  </ion-card>
+
+  <ion-card button routerLink="/teacher/courses-list">
+    <ion-card-header>
+      <ion-card-title>📚 Mis Cursos</ion-card-title>
+    </ion-card-header>
+  </ion-card>
+
+  <ion-card button routerLink="/teacher/profile">
+    <ion-card-header>
+      <ion-card-title>👤 Mi Perfil</ion-card-title>
+    </ion-card-header>
+  </ion-card> -->
+
+  
 
 
   <!-- Estado vacío -->

@@ -15,7 +15,8 @@ export class CourseService {
   constructor(private userService: UserService) {}
 
   // Obtener cursos por estudiante
-  async getCoursesByStudent(studentId: string): Promise<Course[]> {
+  
+  /*async getCoursesByStudent(studentId: string): Promise<Course[]> {
     try {
       // 1. Obtener todas las inscripciones del estudiante
       const enrollmentsSnapshot = await this.db
@@ -61,7 +62,38 @@ export class CourseService {
       console.error('Error al obtener cursos del estudiante:', error);
       throw error;
     }
+  }*/
+
+    async getCoursesByStudent(studentId: string): Promise<Course[]> {
+  try {
+    const snapshot = await this.db.collection(this.coursesCollection).get();
+
+    const filteredCourses: Course[] = [];
+
+    for (const doc of snapshot.docs) {
+      const data = doc.data() as Course & { estudiantes?: any[] };
+
+      const isStudentEnrolled = Array.isArray(data.estudiantes)
+        && data.estudiantes.some((e) => e.id === studentId);
+
+      if (isStudentEnrolled) {
+        const teacher = await this.userService.getUserById(data.profesorId);
+
+        filteredCourses.push({
+          id: doc.id,
+          ...data,
+          profesorNombre: teacher?.nombre || 'Profesor desconocido',
+        } as Course);
+      }
+    }
+
+    return filteredCourses;
+  } catch (error) {
+    console.error('Error al obtener cursos del estudiante:', error);
+    throw error;
   }
+}
+
 
   // Obtener cursos por profesor
   async getCoursesByTeacher(teacherId: string): Promise<Course[]> {

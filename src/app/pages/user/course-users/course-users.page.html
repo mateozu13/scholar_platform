@@ -1,0 +1,29 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Contactos del Curso</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item *ngFor="let user of users" (click)="startChat(user)">
+      <ion-avatar slot="start">
+        <img
+          *ngIf="user.fotoPerfil; else fallbackAvatar"
+          [src]="user.fotoPerfil"
+        />
+        <ng-template #fallbackAvatar>
+          <div class="avatar-fallback">{{ getInitials(user.nombre) }}</div>
+        </ng-template>
+      </ion-avatar>
+      <ion-label>
+        <h2>{{ user.nombre }}</h2>
+        <p>{{ user.rol | titlecase }}</p>
+        <p *ngIf="user.bio">{{ user.bio }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

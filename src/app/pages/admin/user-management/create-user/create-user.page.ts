@@ -8,6 +8,7 @@ import 'firebase/compat/firestore';
 import { User } from 'src/app/models/user.model';
 import { UserService } from 'src/app/services/user.service';
 import { AuthService } from 'src/app/services/auth.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-create-user',
@@ -48,8 +49,8 @@ export class CreateUserPage implements OnInit {
     try {
       const formValues = this.userForm.value;
 
-      // 1. Crear usuario en Firebase Authentication
-      const userCredential = await firebase
+      const secondApp = firebase.initializeApp(environment.firebase, 'user');
+      const userCredential = await secondApp
         .auth()
         .createUserWithEmailAndPassword(formValues.email, this.defaultPassword);
 
@@ -59,7 +60,6 @@ export class CreateUserPage implements OnInit {
 
       const userId = userCredential.user.uid;
 
-      // 2. Crear documento en Firestore
       const newUser: User = {
         id: userId,
         nombre: formValues.nombre,
@@ -68,15 +68,12 @@ export class CreateUserPage implements OnInit {
         telefono: formValues.telefono || '',
         createdAt: new Date(),
         active: true,
-        // Puedes añadir más campos según tu modelo
       };
 
       await this.userService.createUser(newUser);
 
-      // 3. Opcional: Enviar correo de verificación
       await userCredential.user.sendEmailVerification();
 
-      // 4. Mostrar mensaje de éxito
       const alert = await this.alertCtrl.create({
         header: 'Éxito',
         message: `Usuario creado correctamente. Se ha enviado un correo de verificación a ${formValues.email}`,
@@ -96,7 +93,6 @@ export class CreateUserPage implements OnInit {
       let errorMessage =
         'No se pudo crear el usuario. Por favor intenta de nuevo.';
 
-      // Manejo de errores específicos
       if (error.code === 'auth/email-already-in-use') {
         errorMessage = 'El correo electrónico ya está en uso por otra cuenta.';
       } else if (error.code === 'auth/invalid-email') {

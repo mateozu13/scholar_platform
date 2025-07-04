@@ -23,7 +23,8 @@ export class CourseDetailPage implements OnInit {
   loading = true;
 
   assignments: Assignment[] = [];
-  submissionsByAssignment: { [assignmentId: string]: SubmissionWithName[] } = {};
+  submissionsByAssignment: { [assignmentId: string]: SubmissionWithName[] } =
+    {};
   submissions: any[] = [];
 
   quizzes: any[] = [];
@@ -52,10 +53,14 @@ export class CourseDetailPage implements OnInit {
 
     try {
       this.course = await this.courseService.getCourseById(this.courseId);
-      this.assignments = await this.taskService.getAssignmentsByCourse(this.courseId);
+      this.assignments = await this.taskService.getAssignmentsByCourse(
+        this.courseId
+      );
 
       for (const assignment of this.assignments) {
-        const submissions = await this.taskService.getSubmissionsByAssignment(assignment.id);
+        const submissions = await this.taskService.getSubmissionsByAssignment(
+          assignment.id
+        );
         this.submissionsByAssignment[assignment.id] = submissions;
       }
 
@@ -67,10 +72,12 @@ export class CourseDetailPage implements OnInit {
         this.quizResultsByQuiz[quiz.id] = [];
 
         for (const attempt of attempts) {
-          const estudiante = await this.userService.getUserById(attempt.studentId);
+          const estudiante = await this.userService.getUserById(
+            attempt.studentId
+          );
           this.quizResultsByQuiz[quiz.id].push({
             ...attempt,
-            studentName: estudiante?.nombre || 'Desconocido'
+            studentName: estudiante?.nombre || 'Desconocido',
           });
         }
       }
@@ -123,7 +130,9 @@ export class CourseDetailPage implements OnInit {
     this.submissions = [];
 
     for (const assignment of this.assignments) {
-      const submissions = await this.taskService.getSubmissionsByAssignment(assignment.id);
+      const submissions = await this.taskService.getSubmissionsByAssignment(
+        assignment.id
+      );
 
       for (const sub of submissions) {
         const estudiante = await this.userService.getUserById(sub.studentId);
@@ -157,7 +166,11 @@ export class CourseDetailPage implements OnInit {
           text: 'Guardar',
           handler: async (data) => {
             try {
-              await this.taskService.gradeSubmission(submission.id, +data.nota, data.retro);
+              await this.taskService.gradeSubmission(
+                submission.id,
+                +data.nota,
+                data.retro
+              );
               window.alert('✅ Calificación guardada');
               this.cargarEntregas();
             } catch (err) {
@@ -170,7 +183,10 @@ export class CourseDetailPage implements OnInit {
     });
 
     await alert.present();
-    
+  }
+
+  openChatList() {
+    this.router.navigate(['/teacher/course', this.courseId, 'chats']);
   }
 
   async cargarResultadosDeQuizzes() {

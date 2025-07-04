@@ -1,0 +1,130 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/student/task-list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle de Tarea</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ng-container *ngIf="task; else loadingOrError">
+
+    <!-- Información general de la tarea -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ task.titulo }}</ion-card-title>
+        <ion-card-subtitle>
+          Curso: {{ course?.titulo || 'Desconocido' }}
+        </ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+        <p><strong>Descripción:</strong></p>
+        <p>{{ task.descripcion }}</p>
+
+        <ion-item lines="none">
+          <ion-icon name="calendar-outline" slot="start" color="medium"></ion-icon>
+          <p>
+            <strong>Fecha de entrega:</strong>
+            <br />
+            {{ formatDate(task.fechaEntrega) }}
+          </p>
+        </ion-item>
+
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Estado de entrega -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Estado de Entrega</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+
+        <!-- Chips visuales -->
+        <ion-chip color="success" *ngIf="isSubmitted">Entregado</ion-chip>
+        <ion-chip color="danger" *ngIf="!isSubmitted">No entregado</ion-chip>
+        <ion-chip color="warning" *ngIf="isDeadlinePassed">Fuera de plazo</ion-chip>
+        <br>
+        <div *ngIf="submission">
+
+          <ion-item lines="none">
+            <ion-icon name="time-outline" slot="start" color="medium"></ion-icon>
+            <p>
+              <strong>Fecha de envío:</strong>
+              <br />
+              {{ formatDate(submission.fechaEnvio) }}
+            </p>
+          </ion-item>
+
+          <ion-item lines="none">
+            <ion-icon name="document-attach-outline" slot="start" color="medium"></ion-icon>
+            <p>
+              <strong>Archivo: </strong> <a [href]="submission.archivoURL" target="_blank">Ver archivo</a>
+            </p>
+          </ion-item>
+
+        </div>
+
+        <!-- Entregar tarea (solo si no entregó y aún hay tiempo) -->
+        <ion-button expand="block" color="success" *ngIf="canSubmit" (click)="navigateToSubmit()">
+          <ion-icon name="cloud-upload-outline" slot="start"></ion-icon>
+          Entregar tarea
+        </ion-button>
+
+        <!-- Modificar tarea (solo si ya entregó y aún hay tiempo) -->
+        <ion-button expand="block" color="primary" *ngIf="canModify" (click)="navigateToSubmit(true)">
+          <ion-icon name="create-outline" slot="start"></ion-icon>
+          Modificar entrega
+        </ion-button>
+
+
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Evaluación -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Evaluación</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+
+        <ion-item lines="none">
+          <ion-icon name="ribbon-outline" slot="start" color="medium"></ion-icon>
+          <p>
+            Calificación:
+            <strong *ngIf="submission?.calificacion !== undefined; else sinCalificacion">
+              {{ submission?.calificacion }} / 100
+            </strong>
+          </p>
+        </ion-item>
+
+        <ng-template #sinCalificacion>
+          <span class="text-muted">Sin calificar</span>
+        </ng-template>
+
+        <ion-item lines="none">
+          <ion-icon name="chatbubble-ellipses-outline" slot="start" color="medium"></ion-icon>
+          <p>
+            Retroalimentación:
+            <strong *ngIf="submission?.retroalimentacion; else sinComentario">
+              {{ submission?.retroalimentacion }}
+            </strong>
+          </p>
+        </ion-item>
+
+        <ng-template #sinComentario>
+          <span class="text-muted">Sin retroalimentación</span>
+        </ng-template>
+      </ion-card-content>
+    </ion-card>
+
+  </ng-container>
+
+  <ng-template #loadingOrError>
+    <ion-spinner *ngIf="isLoading" name="dots" class="ion-margin"></ion-spinner>
+    <ion-text color="medium" *ngIf="!isLoading">
+      No se pudo cargar la información de la tarea.
+    </ion-text>
+  </ng-template>
+</ion-content>
