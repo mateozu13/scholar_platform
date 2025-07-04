@@ -75,6 +75,11 @@ export class TaskCreatePage implements OnInit {
     }
   }
 
+
+
+
+
+  
   async eliminarTarea(taskId: string) {
     const confirmar = confirm('¿Seguro que deseas eliminar esta tarea?');
     if (!confirmar) return;

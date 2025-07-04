@@ -177,6 +177,8 @@ async deleteAssignment(assignmentId: string): Promise<void> {
     return upcoming;
   }
 
+
+  
   // -----------------------
   // Métodos para profesores
   // -----------------------
@@ -199,6 +201,9 @@ async deleteAssignment(assignmentId: string): Promise<void> {
 
     return reviews;
   }
+
+  
+
 
   /** Próximas tareas de los cursos que dicta el profesor */
   async getTeacherUpcomingAssignments(
@@ -224,4 +229,30 @@ async deleteAssignment(assignmentId: string): Promise<void> {
 
     return upcoming;
   }
+
+
+
+  /** Obtener todas las entregas de todas las tareas de un curso */
+async getSubmissionsByCourse(courseId: string): Promise<Submission[]> {
+  const assignmentsSnap = await this.assignmentsRef
+    .where('courseId', '==', courseId)
+    .get();
+
+  const submissions: Submission[] = [];
+
+  for (const doc of assignmentsSnap.docs) {
+    const assignmentId = doc.id;
+    const submissionsSnap = await this.submissionsRef
+      .where('assignmentId', '==', assignmentId)
+      .get();
+
+    for (const subDoc of submissionsSnap.docs) {
+      submissions.push({ id: subDoc.id, ...(subDoc.data() as Submission) });
+    }
+  }
+
+  return submissions;
 }
+
+}
+

@@ -80,11 +80,13 @@ export class TeacherDashboardPage implements OnInit {
           );
 
         // Obtener estadísticas de estudiantes
-        this.studentStats = {
+         this.studentStats = {
           totalStudents: 0,
           averageGrade: 0,
           assignmentsSubmitted: 0,
-        };
+        }; 
+       
+        
 
         // Crear gráficos
         this.createStatsChart();
@@ -237,4 +239,6 @@ export class TeacherDashboardPage implements OnInit {
     });
     await alert.present();
   }
+
+
 }

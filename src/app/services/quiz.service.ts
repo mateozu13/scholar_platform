@@ -115,6 +115,32 @@ deleteTest(testId: string): Promise<void> {
     }));
   }
 
+async getQuizResultsByTest(testId: string): Promise<(QuizAttempt & { studentName?: string })[]> {
+  const snapshot = await this.firestore
+    .collection(this.attemptsCollection)
+    .where('testId', '==', testId)
+    .get();
+
+  const results: (QuizAttempt & { studentName?: string })[] = [];
+
+  for (const doc of snapshot.docs) {
+    const attempt = doc.data() as QuizAttempt;
+    attempt.id = doc.id;
+
+    
+    const studentDoc = await this.firestore.collection('users').doc(attempt.studentId).get();
+    const studentData = studentDoc.data();
+
+    results.push({
+      ...attempt,
+      studentName: studentData?.nombre || 'Desconocido',
+    });
+  }
+
+  return results;
+}
+
+
   // Guardar comentario del docente
   async updateTeacherComment(submissionId: string, comentario: string): Promise<void> {
     await this.firestore
