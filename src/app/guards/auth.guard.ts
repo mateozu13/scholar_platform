@@ -9,12 +9,17 @@ import {
 import { Observable } from 'rxjs';
 import { AuthService } from '../services/auth.service';
 import { map } from 'rxjs/operators';
+import { AlertController } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthGuard implements CanActivate {
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private alertCtrl: AlertController
+  ) {}
 
   canActivate(
     next: ActivatedRouteSnapshot,
@@ -26,9 +31,18 @@ export class AuthGuard implements CanActivate {
     | UrlTree {
     return this.authService
       .getCurrentUser()
-      .then((user) => {
+      .then(async (user) => {
         if (user) {
-          return true;
+          if (user.active) {
+            return true;
+          }
+          const alert = await this.alertCtrl.create({
+            header: 'Login',
+            message: 'Tu cuenta está inhabilitada, no puedes iniciar sesión.',
+            buttons: ['OK'],
+          });
+          await alert.present();
+          return false;
         } else {
           this.router.navigate(['/login'], {
             queryParams: { returnUrl: state.url },

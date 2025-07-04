@@ -42,7 +42,9 @@ export class CourseDetailPage implements OnInit {
       if (courseId) {
         this.course = await this.courseService.getCourseById(courseId);
         if (this.course && this.course.profesorId) {
-          this.profesor = await this.userService.getUserById(this.course.profesorId);
+          this.profesor = await this.userService.getUserById(
+            this.course.profesorId
+          );
         }
       }
     } catch (error) {
@@ -58,29 +60,28 @@ export class CourseDetailPage implements OnInit {
     }
   }
   navigateTo(section: string) {
-  const courseId = this.course?.id;
-  if (!courseId) return;
+    const courseId = this.course?.id;
+    if (!courseId) return;
 
-  switch (section) {
-    case 'materials':
-      this.router.navigate(['/student/materials', courseId]);
-      break;
-    case 'tasks':
-      this.router.navigate(['/student/course-tasks', courseId]);
-      break;
-    case 'quizzes':
-      this.router.navigate(['/student/course-quizzes', courseId]);
-      break;
-    case 'forums':
-      this.router.navigate(['/student/forums', courseId]);
-      break;
-    case 'grades':
-      this.router.navigate(['/student/grades', courseId]);
-      break;
-    case 'calendar':
-      this.router.navigate(['/student/calendar', courseId]);
-      break;
+    switch (section) {
+      case 'materials':
+        this.router.navigate(['/student/materials', courseId]);
+        break;
+      case 'tareas':
+        this.router.navigate(['/student/task-list']);
+        break;
+      case 'quizzes':
+        this.router.navigate(['/student/course-quizzes', courseId]);
+        break;
+      case 'forums':
+        this.router.navigate(['/student/forums', courseId]);
+        break;
+      case 'grades':
+        this.router.navigate(['/student/grades', courseId]);
+        break;
+      case 'calendar':
+        this.router.navigate(['/student/calendar', courseId]);
+        break;
+    }
   }
-}
-
 }
