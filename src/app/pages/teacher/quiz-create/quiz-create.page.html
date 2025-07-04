@@ -1,14 +1,15 @@
 <ion-header>
   <ion-toolbar color="primary">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/teacher/course-detail/{{ courseId }}"></ion-back-button>
+      <ion-back-button
+        defaultHref="/teacher/course-detail/{{ courseId }}"
+      ></ion-back-button>
     </ion-buttons>
     <ion-title>Crear Quiz</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-
   <!-- Formulario para crear nuevo quiz -->
   <ion-item>
     <ion-label position="floating">Título del Quiz</ion-label>
@@ -26,7 +27,6 @@
         <ion-card-title>Pregunta {{ i + 1 }}</ion-card-title>
       </ion-card-header>
       <ion-card-content>
-
         <ion-item>
           <ion-label position="floating">Texto de la pregunta</ion-label>
           <ion-input [(ngModel)]="pregunta.texto"></ion-input>
@@ -35,9 +35,15 @@
         <ion-item>
           <ion-label>Tipo de pregunta</ion-label>
           <ion-select [(ngModel)]="pregunta.tipo">
-            <ion-select-option value="opcion_multiple">Opción múltiple</ion-select-option>
-            <ion-select-option value="verdadero_falso">Verdadero o falso</ion-select-option>
-            <ion-select-option value="respuesta_corta">Respuesta corta</ion-select-option>
+            <ion-select-option value="opcion_multiple"
+              >Opción múltiple</ion-select-option
+            >
+            <ion-select-option value="verdadero_falso"
+              >Verdadero o falso</ion-select-option
+            >
+            <ion-select-option value="respuesta_corta"
+              >Respuesta corta</ion-select-option
+            >
           </ion-select>
         </ion-item>
 
@@ -52,7 +58,10 @@
           <ion-item>
             <ion-label>Respuesta correcta</ion-label>
             <ion-select [(ngModel)]="pregunta.respuestaCorrecta">
-              <ion-select-option *ngFor="let opcion of pregunta.opciones; let k = index" [value]="k">
+              <ion-select-option
+                *ngFor="let opcion of pregunta.opciones; let k = index"
+                [value]="k"
+              >
                 Opción {{ k + 1 }}
               </ion-select-option>
             </ion-select>
@@ -76,6 +85,15 @@
           </ion-item>
         </div>
 
+        <ion-label>Fecha de Cierre</ion-label>
+        <ion-datetime
+        
+          name="fechaCierre"
+          [(ngModel)]="fechaCierre"
+          presentation="date-time"
+          required
+        ></ion-datetime>
+
         <ion-item>
           <ion-label position="floating">Puntaje</ion-label>
           <ion-input type="number" [(ngModel)]="pregunta.puntaje"></ion-input>
@@ -88,11 +106,18 @@
     </ion-card>
   </div>
 
-  <ion-button expand="block" fill="outline" (click)="agregarPregunta()">+ Agregar Pregunta</ion-button>
-  <ion-button expand="block" class="ion-margin-top" (click)="guardarQuiz()">Guardar Quiz</ion-button>
+  <ion-button expand="block" fill="outline" (click)="agregarPregunta()"
+    >+ Agregar Pregunta</ion-button
+  >
+  <ion-button expand="block" class="ion-margin-top" (click)="guardarQuiz()"
+    >Guardar Quiz</ion-button
+  >
 
   <!-- Lista de quizzes existentes -->
-  <ion-label class="ion-padding-start ion-margin-top" *ngIf="quizzes.length > 0">
+  <ion-label
+    class="ion-padding-start ion-margin-top"
+    *ngIf="quizzes.length > 0"
+  >
     Quizzes Existentes
   </ion-label>
 
@@ -101,15 +126,44 @@
       <ion-label>
         <h2>{{ quiz.titulo }}</h2>
         <p>{{ quiz.descripcion }}</p>
-        <p><strong>Fecha de cierre:</strong> {{ quiz.fechaCierre | date: 'shortDate' }}</p>
+        <p>
+          <strong>Fecha de cierre:</strong> {{ quiz.fechaCierre | date:
+          'shortDate' }}
+        </p>
         <p><strong>Puntos totales:</strong> {{ quiz.puntosTotales }}</p>
       </ion-label>
+
+<ion-button fill="clear" color="primary" (click)="togglePreguntas(quiz.id)">
+  Ver
+</ion-button>
+
+<div *ngIf="quiz.id === quizExpandido">
+  <ion-list>
+    <ion-item *ngFor="let pregunta of preguntasPorQuiz[quiz.id]">
+      <ion-label>
+        <h3>{{ pregunta.texto }}</h3>
+        <p *ngIf="pregunta.tipo === 'opcion_multiple'">Opciones: 
+          <span *ngFor="let opt of pregunta.opciones; let i = index">
+            {{ i + 1 }}. {{ opt.texto }}{{ i < pregunta.opciones.length - 1 ? ', ' : '' }}
+          </span>
+        </p>
+        <p>Respuesta: {{ pregunta.respuestaCorrecta }}</p>
+        <p>Puntaje: {{ pregunta.puntaje }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</div>
+
+
       <ion-button fill="clear" color="danger" (click)="eliminarQuiz(quiz.id)">
         Eliminar
       </ion-button>
     </ion-item>
   </ion-list>
 
-  <ion-spinner *ngIf="isLoading" name="dots" class="ion-margin-top"></ion-spinner>
-
+  <ion-spinner
+    *ngIf="isLoading"
+    name="dots"
+    class="ion-margin-top"
+  ></ion-spinner>
 </ion-content>

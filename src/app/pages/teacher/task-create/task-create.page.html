@@ -23,7 +23,7 @@
       <ion-item>
         <ion-label position="floating">Fecha de Entrega *</ion-label>
         <ion-datetime
-          presentation="date"
+          presentation="date-time"
           [(ngModel)]="task.fechaEntrega"
           name="fechaEntrega"
           required
@@ -45,7 +45,8 @@
     <ion-label>
       <h2>{{ tarea.titulo }}</h2>
       <p>{{ tarea.descripcion }}</p>
-       <p><strong>Fecha de entrega:</strong> {{ task.fechaEntrega | date: 'shortDate' }}</p>
+       <p><strong>Fecha de entrega:</strong> {{ parseDate(tarea.fechaEntrega) | date: 'short' }}</p>
+
     </ion-label>
     <ion-button fill="clear" color="danger" (click)="eliminarTarea(tarea.id)">
       Eliminar

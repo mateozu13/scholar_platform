@@ -3,6 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { QuizService } from 'src/app/services/quiz.service';
 import { v4 as uuidv4 } from 'uuid';
 import { Test } from 'src/app/models/test.model';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-quiz-create',
@@ -17,11 +18,16 @@ export class QuizCreatePage implements OnInit {
   preguntas: any[] = [];
   quizzes: Test[] = [];
   isLoading = true;
+  fechaCierre: string = '';
+
+  quizExpandido: string | null = null; // para mostrar preguntas al hacer clic en "ver"
+  preguntasPorQuiz: { [quizId: string]: any[] } = {};
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private quizService: QuizService
+    private quizService: QuizService,
+    private alertCtrl: AlertController
   ) {}
 
   ngOnInit() {
@@ -30,16 +36,23 @@ export class QuizCreatePage implements OnInit {
     this.cargarQuizzes();
   }
 
+  async togglePreguntas(quizId: string) {
+    if (this.quizExpandido === quizId) {
+      this.quizExpandido = ''; // colapsar
+    } else {
+      this.quizExpandido = quizId;
+
+      if (!this.preguntasPorQuiz[quizId]) {
+        this.preguntasPorQuiz[quizId] =
+          await this.quizService.getQuestionsByTest(quizId);
+      }
+    }
+  }
   agregarPregunta() {
     this.preguntas.push({
       texto: '',
       tipo: 'opcion_multiple',
-      opciones: [
-        { texto: '' },
-        { texto: '' },
-        { texto: '' },
-        { texto: '' }
-      ],
+      opciones: [{ texto: '' }, { texto: '' }, { texto: '' }, { texto: '' }],
       respuestaCorrecta: 0,
       puntaje: 1,
     });
@@ -61,7 +74,7 @@ export class QuizCreatePage implements OnInit {
       titulo: this.titulo,
       descripcion: this.descripcion,
       courseId: this.courseId,
-      fechaCierre: new Date(),
+      fechaCierre: this.fechaCierre ? new Date(this.fechaCierre) : new Date(),
       puntosTotales: this.preguntas.reduce((acc, p) => acc + p.puntaje, 0),
     };
 
@@ -90,6 +103,8 @@ export class QuizCreatePage implements OnInit {
     }
   }
 
+
+
   async cargarQuizzes() {
     try {
       this.isLoading = true;
@@ -102,12 +117,14 @@ export class QuizCreatePage implements OnInit {
   }
 
   async eliminarQuiz(quizId: string) {
-    const confirmar = confirm('¿Estás seguro de que deseas eliminar este quiz?');
+    const confirmar = confirm(
+      '¿Estás seguro de que deseas eliminar este quiz?'
+    );
     if (!confirmar) return;
 
     try {
       await this.quizService.deleteTest(quizId);
-      this.quizzes = this.quizzes.filter(q => q.id !== quizId);
+      this.quizzes = this.quizzes.filter((q) => q.id !== quizId);
       alert('✅ Quiz eliminado');
     } catch (error) {
       console.error('Error al eliminar quiz:', error);

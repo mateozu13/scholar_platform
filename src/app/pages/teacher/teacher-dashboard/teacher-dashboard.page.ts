@@ -51,104 +51,157 @@ export class TeacherDashboardPage implements OnInit {
     await this.loadData();
   }
 
-  async loadData() {
-    this.isLoading = true;
-    const loading = await this.loadingCtrl.create({
-      message: 'Cargando datos...',
-    });
-    await loading.present();
+async loadData() {
+  this.isLoading = true;
+  const loading = await this.loadingCtrl.create({
+    message: 'Cargando datos...',
+  });
+  await loading.present();
 
-    try {
-      // Obtener usuario actual
-      this.currentUser = await this.authService.getCurrentUser();
+  try {
+    this.currentUser = await this.authService.getCurrentUser();
 
-      if (this.currentUser) {
-        // Obtener cursos que imparte
-        this.taughtCourses = await this.courseService.getCoursesByTeacher(
-          this.currentUser.id
-        );
+    if (this.currentUser) {
+      this.taughtCourses = await this.courseService.getCoursesByTeacher(this.currentUser.id);
+await this.calcularEstadisticas();
+      let totalCompletadas = 0;
+      let totalPendientes = 0;
+      let totalSinEntregar = 0;
 
-        // Obtener revisiones pendientes
-        this.pendingReviews = await this.taskService.getPendingReviews(
-          this.currentUser.id
-        );
+      for (const course of this.taughtCourses) {
+        const assignments = await this.taskService.getAssignmentsByCourse(course.id);
+        let completadas = 0;
+        let sinEntregar = 0;
 
-        // Obtener próximas fechas límite para sus cursos
-        this.upcomingDeadlines =
-          await this.taskService.getTeacherUpcomingAssignments(
-            this.currentUser.id
-          );
+        for (const task of assignments) {
+          const submissions = await this.taskService.getSubmissionsByAssignment(task.id);
+          if (submissions.length > 0) {
+            completadas++;
+          } else {
+            sinEntregar++;
+          }
+        }
 
-        // Obtener estadísticas de estudiantes
-         this.studentStats = {
-          totalStudents: 0,
-          averageGrade: 0,
-          assignmentsSubmitted: 0,
-        }; 
-       
-        
+        const total = assignments.length;
+        //const pendientes = total - completadas - sinEntregar;
 
-        // Crear gráficos
-        this.createStatsChart();
+        course.completedAssignments = completadas;
+        course.assignmentsCount = total;
+
+        totalCompletadas += completadas;
+        //totalPendientes += pendientes;
+        totalSinEntregar += sinEntregar;
       }
-    } catch (error) {
-      console.error('Error al cargar datos:', error);
-      const alert = await this.alertCtrl.create({
-        header: 'Error',
-        message: 'No se pudieron cargar los datos del dashboard',
-        buttons: ['OK'],
-      });
-      await alert.present();
-    } finally {
-      this.isLoading = false;
-      await loading.dismiss();
+
+      this.createStatsChart(totalCompletadas, totalSinEntregar);
     }
+  } catch (error) {
+    console.error('Error al cargar datos:', error);
+    const alert = await this.alertCtrl.create({
+      header: 'Error',
+      message: 'No se pudieron cargar los datos del dashboard',
+      buttons: ['OK'],
+    });
+    await alert.present();
+  } finally {
+    this.isLoading = false;
+    await loading.dismiss();
+  }
+}
+
+async calcularEstadisticas() {
+  let totalStudents = 0;
+  let sumaNotas = 0;
+  let cantidadNotas = 0;
+  let revisionesPendientes = 0;
+
+  this.taughtCourses = await this.courseService.getCoursesByTeacher(this.currentUser.id);
+
+  for (const course of this.taughtCourses) {
+    // Total de estudiantes
+    totalStudents += course.estudiantes?.length || 0;
+
+    // Obtener tareas del curso
+    const assignments = await this.taskService.getAssignmentsByCourse(course.id);
+    course.assignmentsCount = assignments.length;
+
+    let tareasCompletadas = 0;
+
+    for (const task of assignments) {
+      const submissions = await this.taskService.getSubmissionsByAssignment(task.id);
+
+      if (submissions.length > 0) {
+        tareasCompletadas++;
+      }
+
+     for (const sub of submissions) {
+  const tieneNota = sub.hasOwnProperty('calificacion') && sub.calificacion !== null && sub.calificacion !== undefined;
+  
+  if (!tieneNota) {
+    revisionesPendientes++;
+  } else {
+    sumaNotas += sub.calificacion;
+    cantidadNotas++;
+  }
+}
+
+    }
+
+    course.completedAssignments = tareasCompletadas;
   }
 
-  createStatsChart() {
-    if (this.statsChart) {
-      this.statsChart.destroy();
-    }
+  this.studentStats = {
+    totalStudents,
+    averageGrade: cantidadNotas > 0 ? Math.round((sumaNotas / cantidadNotas) * 100) / 100 : 0,
+    //pendingReviewsCount: revisionesPendientes,
+  };
+}
 
-    const ctx = document.getElementById('statsChart') as HTMLCanvasElement;
-    this.statsChart = new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: ['Entregadas', 'Pendientes', 'Sin entregar'],
-        datasets: [
-          {
-            data: [65, 20, 15], // Datos simulados
-            backgroundColor: [
-              'rgba(75, 192, 192, 0.7)',
-              'rgba(255, 206, 86, 0.7)',
-              'rgba(255, 99, 132, 0.7)',
-            ],
-            borderColor: [
-              'rgba(75, 192, 192, 1)',
-              'rgba(255, 206, 86, 1)',
-              'rgba(255, 99, 132, 1)',
-            ],
-            borderWidth: 1,
-          },
-        ],
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'bottom',
-          },
-          title: {
-            display: true,
-            text: 'Estado de Tareas',
-            font: {
-              size: 16,
-            },
+  createStatsChart(completadas: number,  sinEntregar: number) {
+  if (this.statsChart) {
+    this.statsChart.destroy();
+  }
+
+  const ctx = document.getElementById('statsChart') as HTMLCanvasElement;
+  this.statsChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Entregadas', 'Sin entregar'],
+      datasets: [
+        {
+          data: [completadas, sinEntregar],
+          backgroundColor: [
+            'rgba(75, 192, 192, 0.7)',
+            'rgba(255, 206, 86, 0.7)',
+            'rgba(255, 99, 132, 0.7)',
+          ],
+          borderColor: [
+            'rgba(75, 192, 192, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(255, 99, 132, 1)',
+          ],
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+        },
+        title: {
+          display: true,
+          text: 'Estado de Tareas',
+          font: {
+            size: 16,
           },
         },
       },
-    });
-  }
+    },
+  });
+}
+
 
   navigateToCourse(courseId: string) {
     this.router.navigate(['/teacher/course-detail', courseId]);

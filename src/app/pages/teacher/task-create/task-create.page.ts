@@ -76,6 +76,20 @@ export class TaskCreatePage implements OnInit {
   }
 
 
+parseDate(input: any): Date | null {
+  if (!input) return null;
+
+  if (typeof input.toDate === 'function') {
+    return input.toDate();
+  }
+
+  if (input.seconds && input.nanoseconds) {
+    const millis = input.seconds * 1000 + Math.floor(input.nanoseconds / 1e6);
+    return new Date(millis);
+  }
+
+  return new Date(input);
+}
 
 
 

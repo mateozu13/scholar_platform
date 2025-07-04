@@ -29,6 +29,10 @@ export class CourseDetailPage implements OnInit {
   quizzes: any[] = [];
   quizResultsByQuiz: { [quizId: string]: any[] } = {};
 
+   quizExpandido: string | null = null; // para mostrar preguntas al hacer clic en "ver"
+  preguntasPorQuiz: { [quizId: string]: any[] } = {};
+
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -89,6 +93,21 @@ export class CourseDetailPage implements OnInit {
       window.alert('No se ha subido un archivo.');
     }
   }
+
+
+   async togglePreguntas(quizId: string) {
+    if (this.quizExpandido === quizId) {
+      this.quizExpandido = ''; // colapsar
+    } else {
+      this.quizExpandido = quizId;
+
+      if (!this.preguntasPorQuiz[quizId]) {
+        this.preguntasPorQuiz[quizId] =
+          await this.quizService.getQuestionsByTest(quizId);
+      }
+    }
+  }
+
 
   parseDate(input: any): Date | null {
     if (!input) return null;
@@ -153,4 +172,10 @@ export class CourseDetailPage implements OnInit {
     await alert.present();
     
   }
+
+  async cargarResultadosDeQuizzes() {
+  for (const quiz of this.quizzes) {
+    this.quizResultsByQuiz[quiz.id] = await this.quizService.getQuizResultsByTest(quiz.id);
+  }
+}
 }

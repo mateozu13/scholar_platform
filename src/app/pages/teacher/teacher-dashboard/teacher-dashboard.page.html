@@ -53,14 +53,14 @@
           </ion-card-content>
         </ion-card>
       </ion-col>
-      <ion-col size="6" size-md="3">
+      <!-- <ion-col size="6" size-md="3">
         <ion-card class="stat-card">
           <ion-card-content>
-            <h2>{{pendingReviews.length}}</h2>
+            <h2>{{studentStats.pendingReviewsCount || 0}}</h2>
             <p>Revisiones Pendientes</p>
           </ion-card-content>
         </ion-card>
-      </ion-col>
+      </ion-col> -->
       <ion-col size="6" size-md="3">
         <ion-card class="stat-card">
           <ion-card-content>
@@ -69,7 +69,7 @@
           </ion-card-content>
         </ion-card>
       </ion-col>
-      <ion-col size="6" size-md="3">
+      <ion-col size="12">
         <ion-card class="stat-card">
           <ion-card-content>
             <h2>{{studentStats.averageGrade || 0}}%</h2>
@@ -188,7 +188,7 @@
                     >{{course.assignmentsCount || 0}} tareas</ion-badge
                   >
                   <ion-badge color="success"
-                    >{{course.completedAssignments || 0}} completadas</ion-badge
+                    >{{course.completedAssignments}} completadas</ion-badge
                   >
                 </div>
               </ion-card-content>
@@ -199,26 +199,7 @@
     </ion-card-content>
   </ion-card>
 
-<!-- <ion-content class="ion-padding">
-  <ion-card button routerLink="/teacher/chat-list">
-    <ion-card-header>
-      <ion-card-title>📩 Ver Chats</ion-card-title>
-    </ion-card-header>
-  </ion-card>
-
-  <ion-card button routerLink="/teacher/courses-list">
-    <ion-card-header>
-      <ion-card-title>📚 Mis Cursos</ion-card-title>
-    </ion-card-header>
-  </ion-card>
-
-  <ion-card button routerLink="/teacher/profile">
-    <ion-card-header>
-      <ion-card-title>👤 Mi Perfil</ion-card-title>
-    </ion-card-header>
-  </ion-card> -->
-
-  
+ 
 
 
   <!-- Estado vacío -->
