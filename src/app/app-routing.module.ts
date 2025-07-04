@@ -136,6 +136,19 @@ const routes: Routes = [
         path: 'task-submit/:taskId',
         loadChildren: () => import('./pages/student/task-submit/task-submit.module').then(m => m.TaskSubmitPageModule)
       },
+      {
+        path: 'quiz-list',
+        loadChildren: () => import('./pages/student/quiz-list/quiz-list.module').then(m => m.QuizListPageModule)
+      },
+
+      {
+        path: 'quiz-detail/:quizId',
+        loadChildren: () => import('./pages/student/quiz-detail/quiz-detail.module').then(m => m.QuizDetailPageModule)
+      },
+      {
+        path: 'quiz-attempt/:quizId',
+        loadChildren: () => import('./pages/student/quiz-attempt/quiz-attempt.module').then(m => m.QuizAttemptPageModule)
+      },
 
     ],
   },
@@ -252,6 +265,8 @@ const routes: Routes = [
     redirectTo: 'login',
     pathMatch: 'full',
   },
+
+
 
 ];
 

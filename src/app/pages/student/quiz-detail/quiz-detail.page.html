@@ -1,0 +1,80 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/student/quiz-list"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalles de Evaluación</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ng-container *ngIf="quiz; else loadingOrError">
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>{{ quiz.titulo }}</ion-card-title>
+        <ion-card-subtitle>
+          Evaluación del curso
+        </ion-card-subtitle>
+      </ion-card-header>
+      <ion-card-content>
+
+        <ion-item lines="none">
+          <ion-icon name="information-circle-outline" slot="start" color="medium"></ion-icon>
+          <p>
+            {{ quiz.descripcion }}
+          </p>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-icon name="calendar-outline" slot="start" color="medium"></ion-icon>
+          <p>
+            <strong>Inicio: </strong>
+            {{ formatDate(quiz.fechaInicio) || 'No especificado' }}
+          </p>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-icon name="calendar-clear-outline" slot="start" color="medium"></ion-icon>
+          <p>
+            <strong>Cierre: </strong>
+            {{ formatDate(quiz.fechaCierre) }}
+          </p>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-icon name="hourglass-outline" slot="start" color="medium"></ion-icon>
+          <p>
+            <strong>Duración: </strong>
+            {{ quiz.duracion || 'Ilimitada' }} minutos
+          </p>
+        </ion-item>
+        
+        <ion-item lines="none">
+          <ion-icon name="sync-outline" slot="start" color="medium"></ion-icon>
+          <p>
+            <strong>Intentos permitidos: </strong>
+            {{ quiz.intentosPermitidos || 1 }}
+          </p>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-icon name="stats-chart-outline" slot="start" color="medium"></ion-icon>
+          <p>
+            <strong>Puntos totales: </strong>
+            {{ quiz.puntosTotales }}
+          </p>
+        </ion-item>
+
+        <ion-button expand="block" color="success" (click)="startQuiz()">
+          <ion-icon name="play-circle-outline" slot="start"></ion-icon>
+          Comenzar Evaluación
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
+  </ng-container>
+
+  <ng-template #loadingOrError>
+    <ion-spinner *ngIf="isLoading" name="dots"></ion-spinner>
+    <ion-text color="medium" *ngIf="!isLoading">No se pudo cargar la evaluación.</ion-text>
+  </ng-template>
+</ion-content>
