@@ -20,61 +20,82 @@
 
         <ion-item lines="none">
           <ion-icon name="information-circle-outline" slot="start" color="medium"></ion-icon>
-          <p>
-            {{ quiz.descripcion }}
-          </p>
+          <p>{{ quiz.descripcion }}</p>
         </ion-item>
 
         <ion-item lines="none">
           <ion-icon name="calendar-outline" slot="start" color="medium"></ion-icon>
           <p>
-            <strong>Inicio: </strong>
-            {{ formatDate(quiz.fechaInicio) || 'No especificado' }}
+            <strong>Inicio:</strong> {{ formatDate(quiz.fechaInicio) || 'No especificado' }}
           </p>
         </ion-item>
 
         <ion-item lines="none">
           <ion-icon name="calendar-clear-outline" slot="start" color="medium"></ion-icon>
           <p>
-            <strong>Cierre: </strong>
-            {{ formatDate(quiz.fechaCierre) }}
+            <strong>Cierre:</strong> {{ formatDate(quiz.fechaCierre) }}
           </p>
         </ion-item>
 
         <ion-item lines="none">
           <ion-icon name="hourglass-outline" slot="start" color="medium"></ion-icon>
           <p>
-            <strong>Duración: </strong>
-            {{ quiz.duracion || 'Ilimitada' }} minutos
+            <strong>Duración:</strong> {{ quiz.duracion || 'Ilimitada' }} minutos
           </p>
         </ion-item>
-        
+
         <ion-item lines="none">
           <ion-icon name="sync-outline" slot="start" color="medium"></ion-icon>
           <p>
-            <strong>Intentos permitidos: </strong>
-            {{ quiz.intentosPermitidos || 1 }}
+            <strong>Intentos permitidos:</strong> {{ quiz.intentosPermitidos || 1 }}
           </p>
         </ion-item>
 
         <ion-item lines="none">
           <ion-icon name="stats-chart-outline" slot="start" color="medium"></ion-icon>
           <p>
-            <strong>Puntos totales: </strong>
-            {{ quiz.puntosTotales }}
+            <strong>Puntos totales:</strong> {{ quiz.puntosTotales }}
           </p>
         </ion-item>
 
-        <ion-button expand="block" color="success" (click)="startQuiz()">
+        <!-- Mostrar intento previo si existe -->
+        <div *ngIf="existingAttempt" class="attempt-info">
+          <ion-item lines="none" color="success">
+            <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+            <ion-label>
+              <strong>Evaluación ya realizada</strong><br />
+              Puntuación: {{ existingAttempt.score }} puntos<br />
+              Fecha de envío: {{ formatDate(existingAttempt.fechaEnvio) }}<br />
+              Comentario: {{ existingAttempt.comentarioDocente || 'Sin comentarios' }}
+            </ion-label>
+          </ion-item>
+        </div>
+
+        <!-- Mostrar botón si puede rendir -->
+        <ion-button
+          *ngIf="canStartQuiz"
+          expand="block"
+          color="success"
+          (click)="startQuiz()"
+        >
           <ion-icon name="play-circle-outline" slot="start"></ion-icon>
           Comenzar Evaluación
         </ion-button>
+
+        <!-- Mostrar mensaje si ya no puede rendir -->
+        <ion-text color="danger" *ngIf="!canStartQuiz && !existingAttempt">
+          <p class="ion-text-center ion-margin-top">
+            No puedes rendir esta evaluación. Ya expiró o agotaste los intentos.
+          </p>
+        </ion-text>
       </ion-card-content>
     </ion-card>
   </ng-container>
 
   <ng-template #loadingOrError>
     <ion-spinner *ngIf="isLoading" name="dots"></ion-spinner>
-    <ion-text color="medium" *ngIf="!isLoading">No se pudo cargar la evaluación.</ion-text>
+    <ion-text color="medium" *ngIf="!isLoading">
+      No se pudo cargar la evaluación.
+    </ion-text>
   </ng-template>
 </ion-content>

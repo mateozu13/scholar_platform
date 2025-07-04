@@ -184,6 +184,10 @@ const routes: Routes = [
         loadChildren: () =>
           import('./pages/user/chat/chat.module').then((m) => m.ChatPageModule),
       },
+      {
+        path: 'material-course',
+        loadChildren: () => import('./pages/student/material-course/material-course.module').then(m => m.MaterialCoursePageModule)
+      },
     ],
   },
 
@@ -303,6 +307,7 @@ const routes: Routes = [
     redirectTo: 'login',
     pathMatch: 'full',
   },
+
 ];
 
 @NgModule({
@@ -311,4 +316,4 @@ const routes: Routes = [
   ],
   exports: [RouterModule],
 })
-export class AppRoutingModule {}
+export class AppRoutingModule { }
