@@ -1,0 +1,60 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title *ngIf="otherUser">{{ otherUser.nombre }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content #content>
+  <div class="chat-container">
+    <div
+      *ngFor="let message of messages"
+      [class.sent]="message.senderId === currentUserId"
+      [class.received]="message.senderId !== currentUserId"
+    >
+      <div class="message">
+        <p>{{ message.text }}</p>
+        <div class="message-footer">
+          <span class="time"
+            >{{ message.timestamp?.toDate() | date: 'shortTime' }}</span
+          >
+          <ion-icon
+            *ngIf="message.senderId === currentUserId"
+            [name]="getMessageStatusIcon(message.status)"
+          ></ion-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <form (ngSubmit)="sendMessage()" #messageForm="ngForm">
+      <ion-grid>
+        <ion-row>
+          <ion-col size="10">
+            <ion-input
+              [(ngModel)]="newMessage"
+              name="newMessage"
+              placeholder="Escribe un mensaje..."
+              required
+              (keyup.enter)="sendMessage()"
+            ></ion-input>
+          </ion-col>
+          <ion-col size="2">
+            <ion-button
+              type="submit"
+              expand="block"
+              [disabled]="!newMessage.trim()"
+            >
+              <ion-icon name="send"></ion-icon>
+            </ion-button>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </form>
+  </ion-toolbar>
+</ion-footer>

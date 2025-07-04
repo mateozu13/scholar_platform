@@ -1,0 +1,53 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
+    <ion-title>Chats</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="openCourseUsers()">
+        <ion-icon slot="icon-only" name="person-add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div *ngIf="isLoading" class="loading-spinner">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+
+  <ion-list *ngIf="!isLoading && chats?.length > 0">
+    <ion-item *ngFor="let chat of chats" (click)="openChat(chat)">
+      <ion-avatar slot="start">
+        <img
+          *ngIf="chat.otherUser?.fotoPerfil; else fallbackAvatar"
+          [src]="chat.otherUser.fotoPerfil"
+        />
+        <ng-template #fallbackAvatar>
+          <div class="avatar-fallback">
+            {{ getInitials(chat.otherUser?.nombre) }}
+          </div>
+        </ng-template>
+      </ion-avatar>
+      <ion-label>
+        <h2>{{ chat.otherUser?.nombre || 'Usuario desconocido' }}</h2>
+        <p>{{ chat.lastMessage || 'Sin mensajes aún' }}</p>
+      </ion-label>
+      <div slot="end" class="chat-meta">
+        <ion-note *ngIf="chat.lastMessageTimestamp">
+          {{ chat.lastMessageTimestamp | date: 'shortTime' }}
+        </ion-note>
+        <ion-badge *ngIf="chat.unreadCount > 0" color="danger">
+          {{ chat.unreadCount }}
+        </ion-badge>
+      </div>
+    </ion-item>
+  </ion-list>
+
+  <div *ngIf="!isLoading && chats?.length === 0" class="empty-state">
+    <ion-icon name="chatbubbles-outline" class="empty-icon"></ion-icon>
+    <h4>No hay conversaciones</h4>
+    <p>Inicia una conversación con un compañero o profesor</p>
+  </div>
+</ion-content>

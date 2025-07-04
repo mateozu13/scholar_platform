@@ -10,7 +10,11 @@
 <ion-content *ngIf="!loading; else loadingTemplate" class="ion-padding">
   <ng-container *ngIf="course; else notFoundTemplate">
     <ion-card>
-      <img *ngIf="course.imagenUrl" [src]="course.imagenUrl" alt="Imagen del curso" />
+      <img
+        *ngIf="course.imagenUrl"
+        [src]="course.imagenUrl"
+        alt="Imagen del curso"
+      />
       <ion-card-header>
         <ion-card-title>{{ course.titulo }}</ion-card-title>
         <ion-card-subtitle>
@@ -32,85 +36,119 @@
       <ion-item button (click)="goTo('quiz-create')">
         <ion-label>Crear Quiz</ion-label>
       </ion-item>
-
-
-
     </ion-list>
 
     <ion-accordion-group>
-  <ion-accordion value="tareas">
-    <ion-item slot="header" color="light">
-      <ion-label>📂 Ver Tareas</ion-label>
-    </ion-item>
+      <ion-accordion value="tareas">
+        <ion-item slot="header" color="light">
+          <ion-label>📂 Ver Tareas</ion-label>
+        </ion-item>
 
-    <div class="ion-padding" slot="content">
-      <ion-card *ngFor="let assignment of assignments">
-        <ion-card-header>
-          <ion-card-title>{{ assignment.titulo }}</ion-card-title>
-          <p><strong>Fecha límite:</strong> {{ parseDate(assignment.fechaEntrega) | date:'short' }}</p>
-        </ion-card-header>
+        <div class="ion-padding" slot="content">
+          <ion-card *ngFor="let assignment of assignments">
+            <ion-card-header>
+              <ion-card-title>{{ assignment.titulo }}</ion-card-title>
+              <p>
+                <strong>Fecha límite:</strong> {{
+                parseDate(assignment.fechaEntrega) | date:'short' }}
+              </p>
+            </ion-card-header>
 
-        <ion-card-content>
-          <ion-list *ngIf="submissionsByAssignment[assignment.id]?.length > 0; else noSubmissions">
-            <ion-item *ngFor="let submission of submissionsByAssignment[assignment.id]">
-              <ion-label>
-                <p><strong>Estudiante:</strong> {{ submission.studentName }}</p>
-                <p><strong>Fecha de entrega:</strong> {{ parseDate(submission.fechaEnvio) | date:'short' }}</p>
-                <p>Nota: {{ submission.calificacion ?? 'No calificado' }}</p>
-                <p *ngIf="submission.retroalimentacion">💬 {{ submission.retroalimentacion }}</p>
-              </ion-label>
-              <ion-button fill="outline" color="success" (click)="calificar(submission)">
-                Calificar
-              </ion-button>
-              <ion-button size="small" fill="outline" (click)="abrirArchivo(submission)">
-                Ver
-              </ion-button>
-            </ion-item>
-          </ion-list>
-          <ng-template #noSubmissions>
-            <p class="ion-text-center">No hay entregas registradas aún.</p>
-          </ng-template>
-        </ion-card-content>
-      </ion-card>
-    </div>
-  </ion-accordion>
-</ion-accordion-group>
+            <ion-card-content>
+              <ion-list
+                *ngIf="submissionsByAssignment[assignment.id]?.length > 0; else noSubmissions"
+              >
+                <ion-item
+                  *ngFor="let submission of submissionsByAssignment[assignment.id]"
+                >
+                  <ion-label>
+                    <p>
+                      <strong>Estudiante:</strong> {{ submission.studentName }}
+                    </p>
+                    <p>
+                      <strong>Fecha de entrega:</strong> {{
+                      parseDate(submission.fechaEnvio) | date:'short' }}
+                    </p>
+                    <p>
+                      Nota: {{ submission.calificacion ?? 'No calificado' }}
+                    </p>
+                    <p *ngIf="submission.retroalimentacion">
+                      💬 {{ submission.retroalimentacion }}
+                    </p>
+                  </ion-label>
+                  <ion-button
+                    fill="outline"
+                    color="success"
+                    (click)="calificar(submission)"
+                  >
+                    Calificar
+                  </ion-button>
+                  <ion-button
+                    size="small"
+                    fill="outline"
+                    (click)="abrirArchivo(submission)"
+                  >
+                    Ver
+                  </ion-button>
+                </ion-item>
+              </ion-list>
+              <ng-template #noSubmissions>
+                <p class="ion-text-center">No hay entregas registradas aún.</p>
+              </ng-template>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </ion-accordion>
+    </ion-accordion-group>
 
+    <ion-accordion-group>
+      <ion-accordion value="pruebas">
+        <ion-item slot="header" color="light">
+          <ion-label>🧪 Ver Pruebas</ion-label>
+        </ion-item>
 
-<ion-accordion-group>
-  <ion-accordion value="pruebas">
-    <ion-item slot="header" color="light">
-      <ion-label>🧪 Ver Pruebas</ion-label>
-    </ion-item>
+        <div class="ion-padding" slot="content">
+          <ion-card *ngFor="let quiz of quizzes">
+            <ion-card-header>
+              <ion-card-title>{{ quiz.titulo }}</ion-card-title>
+              <p>
+                <strong>Fecha de cierre:</strong> {{ parseDate(quiz.fechaCierre)
+                | date:'short' }}
+              </p>
+            </ion-card-header>
 
-    <div class="ion-padding" slot="content">
-      <ion-card *ngFor="let quiz of quizzes">
-        <ion-card-header>
-          <ion-card-title>{{ quiz.titulo }}</ion-card-title>
-          <p><strong>Fecha de cierre:</strong> {{ parseDate(quiz.fechaCierre) | date:'short' }}</p>
-        </ion-card-header>
-
-        <ion-card-content>
-          <ion-list *ngIf="quizResultsByQuiz[quiz.id]?.length > 0; else noResults">
-            <ion-item *ngFor="let result of quizResultsByQuiz[quiz.id]">
-              <ion-label>
-                <p><strong>Estudiante:</strong> {{ result.studentName }}</p>
-                <p>Nota: {{ result.nota ?? 'No calificado' }}</p>
-                <p *ngIf="result.retroalimentacion">💬 {{ result.retroalimentacion }}</p>
-              </ion-label>
-            </ion-item>
-          </ion-list>
-          <ng-template #noResults>
-            <p class="ion-text-center">No hay resultados registrados aún.</p>
-          </ng-template>
-        </ion-card-content>
-      </ion-card>
-    </div>
-  </ion-accordion>
-</ion-accordion-group>
-
-
+            <ion-card-content>
+              <ion-list
+                *ngIf="quizResultsByQuiz[quiz.id]?.length > 0; else noResults"
+              >
+                <ion-item *ngFor="let result of quizResultsByQuiz[quiz.id]">
+                  <ion-label>
+                    <p><strong>Estudiante:</strong> {{ result.studentName }}</p>
+                    <p>Nota: {{ result.nota ?? 'No calificado' }}</p>
+                    <p *ngIf="result.retroalimentacion">
+                      💬 {{ result.retroalimentacion }}
+                    </p>
+                  </ion-label>
+                </ion-item>
+              </ion-list>
+              <ng-template #noResults>
+                <p class="ion-text-center">
+                  No hay resultados registrados aún.
+                </p>
+              </ng-template>
+            </ion-card-content>
+          </ion-card>
+        </div>
+      </ion-accordion>
+    </ion-accordion-group>
   </ng-container>
+
+  <!-- Abrir chat -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="openChatList()">
+      <ion-icon name="chatbubbles"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
 
 <ng-template #loadingTemplate>

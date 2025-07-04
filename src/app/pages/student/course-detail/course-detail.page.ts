@@ -13,6 +13,7 @@ import { AlertController, LoadingController } from '@ionic/angular';
   standalone: false,
 })
 export class CourseDetailPage implements OnInit {
+  courseId = '';
   course: Course | null = null;
   profesor: User | null = null;
   isLoading = false;
@@ -27,6 +28,7 @@ export class CourseDetailPage implements OnInit {
   ) {}
 
   async ngOnInit() {
+    this.courseId = this.route.snapshot.paramMap.get('courseId') || '';
     await this.loadCourse();
   }
 
@@ -83,5 +85,9 @@ export class CourseDetailPage implements OnInit {
         this.router.navigate(['/student/calendar', courseId]);
         break;
     }
+  }
+
+  openChatList() {
+    this.router.navigate(['/student/course', this.courseId, 'chats']);
   }
 }

@@ -108,7 +108,10 @@ const routes: Routes = [
       },
       {
         path: 'courses-list',
-        loadChildren: () => import('./pages/student/courses-list/courses-list.module').then(m => m.CoursesListPageModule)
+        loadChildren: () =>
+          import('./pages/student/courses-list/courses-list.module').then(
+            (m) => m.CoursesListPageModule
+          ),
       },
 
       {
@@ -134,22 +137,53 @@ const routes: Routes = [
       },
       {
         path: 'task-submit/:taskId',
-        loadChildren: () => import('./pages/student/task-submit/task-submit.module').then(m => m.TaskSubmitPageModule)
+        loadChildren: () =>
+          import('./pages/student/task-submit/task-submit.module').then(
+            (m) => m.TaskSubmitPageModule
+          ),
       },
       {
         path: 'quiz-list',
-        loadChildren: () => import('./pages/student/quiz-list/quiz-list.module').then(m => m.QuizListPageModule)
+        loadChildren: () =>
+          import('./pages/student/quiz-list/quiz-list.module').then(
+            (m) => m.QuizListPageModule
+          ),
       },
 
       {
         path: 'quiz-detail/:quizId',
-        loadChildren: () => import('./pages/student/quiz-detail/quiz-detail.module').then(m => m.QuizDetailPageModule)
+        loadChildren: () =>
+          import('./pages/student/quiz-detail/quiz-detail.module').then(
+            (m) => m.QuizDetailPageModule
+          ),
       },
       {
         path: 'quiz-attempt/:quizId',
-        loadChildren: () => import('./pages/student/quiz-attempt/quiz-attempt.module').then(m => m.QuizAttemptPageModule)
+        loadChildren: () =>
+          import('./pages/student/quiz-attempt/quiz-attempt.module').then(
+            (m) => m.QuizAttemptPageModule
+          ),
       },
 
+      {
+        path: 'course/:courseId/chats',
+        loadChildren: () =>
+          import('./pages/user/chat-list/chat-list.module').then(
+            (m) => m.ChatListPageModule
+          ),
+      },
+      {
+        path: 'course/:courseId/users',
+        loadChildren: () =>
+          import('./pages/user/course-users/course-users.module').then(
+            (m) => m.CourseUsersPageModule
+          ),
+      },
+      {
+        path: 'chat/:chatId',
+        loadChildren: () =>
+          import('./pages/user/chat/chat.module').then((m) => m.ChatPageModule),
+      },
     ],
   },
 
@@ -167,9 +201,9 @@ const routes: Routes = [
       {
         path: 'dashboard',
         loadChildren: () =>
-          import('./pages/teacher/teacher-dashboard/teacher-dashboard.module').then(
-            (m) => m.TeacherDashboardPageModule
-          ),
+          import(
+            './pages/teacher/teacher-dashboard/teacher-dashboard.module'
+          ).then((m) => m.TeacherDashboardPageModule),
       },
       {
         path: 'profile',
@@ -216,9 +250,9 @@ const routes: Routes = [
       {
         path: 'submission-review/:submissionId',
         loadChildren: () =>
-          import('./pages/teacher/submission-review/submission-review.module').then(
-            (m) => m.SubmissionReviewPageModule
-          ),
+          import(
+            './pages/teacher/submission-review/submission-review.module'
+          ).then((m) => m.SubmissionReviewPageModule),
       },
       {
         path: 'quiz-create/:courseId',
@@ -242,20 +276,24 @@ const routes: Routes = [
           ),
       },
       {
-        path: 'chat-list',
+        path: 'course/:courseId/chats',
         loadChildren: () =>
-          import('./pages/teacher/chat-list/chat-list.module').then(
+          import('./pages/user/chat-list/chat-list.module').then(
             (m) => m.ChatListPageModule
           ),
       },
       {
-        path: 'chat-detail/:chatId',
+        path: 'course/:courseId/users',
         loadChildren: () =>
-          import('./pages/teacher/chat-detail/chat-detail.module').then(
-            (m) => m.ChatDetailPageModule
+          import('./pages/user/course-users/course-users.module').then(
+            (m) => m.CourseUsersPageModule
           ),
       },
-
+      {
+        path: 'chat/:chatId',
+        loadChildren: () =>
+          import('./pages/user/chat/chat.module').then((m) => m.ChatPageModule),
+      },
     ],
   },
 
@@ -265,9 +303,6 @@ const routes: Routes = [
     redirectTo: 'login',
     pathMatch: 'full',
   },
-
-
-
 ];
 
 @NgModule({
@@ -276,4 +311,4 @@ const routes: Routes = [
   ],
   exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

@@ -8,61 +8,74 @@
 </ion-header>
 
 <ion-content class="ion-padding">
-
   <ng-container *ngIf="course; else loadingOrEmpty">
-
     <!-- Cabecera del curso -->
     <ion-card>
       <div class="course-thumbnail">
-        <img *ngIf="course.imagenUrl" [src]="course.imagenUrl" alt="Imagen del curso" />
+        <img
+          *ngIf="course.imagenUrl"
+          [src]="course.imagenUrl"
+          alt="Imagen del curso"
+        />
         <div *ngIf="!course.imagenUrl" class="thumbnail-fallback">
           {{ course.titulo | slice:0:1 }}
         </div>
       </div>
       <ion-card-header>
         <ion-card-title>{{ course.titulo }}</ion-card-title>
-        <ion-card-subtitle>Profesor: {{ profesor?.nombre || 'Desconocido' }}</ion-card-subtitle>
+        <ion-card-subtitle
+          >Profesor: {{ profesor?.nombre || 'Desconocido' }}</ion-card-subtitle
+        >
       </ion-card-header>
       <ion-card-content>
         <p>{{ course.descripcion }}</p>
       </ion-card-content>
 
       <div class="section-title">Contenido del Curso</div>
-  <div class="section-grid">
-    <div class="section-card" (click)="navigateTo('clases')">
-      <ion-icon name="videocam-outline"></ion-icon>
-      <span class="section-label">Clases en Video</span>
-    </div>
+      <div class="section-grid">
+        <div class="section-card" (click)="navigateTo('clases')">
+          <ion-icon name="videocam-outline"></ion-icon>
+          <span class="section-label">Clases en Video</span>
+        </div>
 
-    <div class="section-card" (click)="navigateTo('material')">
-      <ion-icon name="document-text-outline"></ion-icon>
-      <span class="section-label">Recursos y Material</span>
-    </div>
+        <div class="section-card" (click)="navigateTo('material')">
+          <ion-icon name="document-text-outline"></ion-icon>
+          <span class="section-label">Recursos y Material</span>
+        </div>
 
-    <div class="section-card" (click)="navigateTo('tareas')">
-      <ion-icon name="clipboard-outline"></ion-icon>
-      <span class="section-label">Tareas y Evaluaciones</span>
-    </div>
+        <div class="section-card" (click)="navigateTo('tareas')">
+          <ion-icon name="clipboard-outline"></ion-icon>
+          <span class="section-label">Tareas y Evaluaciones</span>
+        </div>
 
-    <div class="section-card" (click)="navigateTo('foro')">
-      <ion-icon name="chatbubbles-outline"></ion-icon>
-      <span class="section-label">Foros</span>
-    </div>
+        <div class="section-card" (click)="navigateTo('foro')">
+          <ion-icon name="chatbubbles-outline"></ion-icon>
+          <span class="section-label">Foros</span>
+        </div>
 
-    <div class="section-card" (click)="navigateTo('calificaciones')">
-      <ion-icon name="ribbon-outline"></ion-icon>
-      <span class="section-label">Calificaciones</span>
-    </div>
-  </div>
+        <div class="section-card" (click)="navigateTo('calificaciones')">
+          <ion-icon name="ribbon-outline"></ion-icon>
+          <span class="section-label">Calificaciones</span>
+        </div>
+      </div>
     </ion-card>
-    
   </ng-container>
 
   <ng-template #loadingOrEmpty>
-    <ion-spinner *ngIf="isLoading" name="dots" class="ion-padding"></ion-spinner>
+    <ion-spinner
+      *ngIf="isLoading"
+      name="dots"
+      class="ion-padding"
+    ></ion-spinner>
     <div *ngIf="!isLoading">
       <ion-text color="medium">No se pudo cargar el curso.</ion-text>
     </div>
   </ng-template>
 
+  <!-- Abrir chat -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="openChatList()">
+      <ion-icon name="chatbubbles"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
