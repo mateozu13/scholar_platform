@@ -37,7 +37,7 @@ export class QuizDetailPage implements OnInit {
     const user = await this.authService.getCurrentUser();
     this.userId = user?.id || '';
     await this.loadQuizDetail();
-    await this.loadAttempts();
+    await this.checkUserAttempts();
   }
 
   async loadQuizDetail() {
@@ -99,35 +99,57 @@ export class QuizDetailPage implements OnInit {
   }
 
   startQuiz() {
-    if (this.canAttempt) {
-      this.router.navigate(['/student/quiz-attempt', this.quizId]);
-    }
+    this.router.navigate(['/student/quiz-attempt', this.quizId]);
+
   }
 
   async checkUserAttempts() {
-  const user = await this.authService.getCurrentUser();
-  if (!user || !this.quiz) return;
+    const user = await this.authService.getCurrentUser();
+    if (!user || !this.quiz) return;
 
-  const attempts = await this.quizService.getAttemptsByTest(this.quizId);
-  const userAttempts = attempts.filter(a => a.studentId === user.id);
+    const allAttempts = await this.quizService.getAttemptsByStudent(user.id);
+    const quizAttempts = allAttempts.filter(a => a.testId === this.quizId);
+    this.existingAttempts = quizAttempts;
 
-  // Tomamos el intento más reciente
-  this.existingAttempt = userAttempts.sort((a, b) =>
-    (b.fechaEnvio as any) - (a.fechaEnvio as any)
-  )[0] || null;
+    this.existingAttempt = quizAttempts.length > 0
+      ? quizAttempts.sort((a, b) =>
+        new Date(b.fechaEnvio).getTime() - new Date(a.fechaEnvio).getTime()
+      )[0]
+      : null;
 
-  const intentosPermitidos = this.quiz.intentosPermitidos || 1;
-  const intentosRealizados = userAttempts.length;
+    const intentosPermitidos = this.quiz.intentosPermitidos ?? 1;
+    const intentosRealizados = quizAttempts.length;
 
-  const ahora = new Date();
-  const fechaInicio = this.quiz.fechaInicio ? new Date(this.quiz.fechaInicio) : null;
-  const fechaCierre = this.quiz.fechaCierre ? new Date(this.quiz.fechaCierre) : null;
+    const fechaInicio = this.quiz.fechaInicio
+      ? this.quiz.fechaInicio instanceof Date
+        ? this.quiz.fechaInicio
+        : (this.quiz.fechaInicio as firebase.firestore.Timestamp).toDate()
+      : null;
 
-  // Validar si puede rendir (dentro de la fecha y no ha superado los intentos)
-  this.canStartQuiz =
-    (!fechaInicio || ahora >= fechaInicio) &&
-    (!fechaCierre || ahora <= fechaCierre) &&
-    intentosRealizados < intentosPermitidos;
-}
+    const ahora = new Date();
+    const fechaCierre = this.quiz.fechaCierre
+      ? this.quiz.fechaCierre instanceof Date
+        ? this.quiz.fechaCierre
+        : (this.quiz.fechaCierre as firebase.firestore.Timestamp).toDate()
+      : null;
+
+    const dentroDeFechas =
+      (!fechaInicio || ahora >= fechaInicio) &&
+      (!fechaCierre || ahora <= fechaCierre);
+
+    this.canStartQuiz = dentroDeFechas && intentosRealizados < intentosPermitidos;
+
+    console.log('Intentos permitidos:', intentosPermitidos);
+    console.log('Intentos realizados:', intentosRealizados);
+    console.log('Dentro de fechas:', dentroDeFechas);
+    console.log('¿Puede iniciar?:', this.canStartQuiz);
+
+    console.log('Quiz:', this.quiz);
+    console.log('Fecha cierre:', this.quiz?.fechaCierre);
+    console.log('Ahora:', new Date());
+
+  }
+
+
 
 }
