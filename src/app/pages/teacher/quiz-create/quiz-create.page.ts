@@ -19,6 +19,8 @@ export class QuizCreatePage implements OnInit {
   quizzes: Test[] = [];
   isLoading = true;
   fechaCierre: string = '';
+  fechaInicio: string = '';
+intentosPermitidos: number = 1;
 
   quizExpandido: string | null = null; // para mostrar preguntas al hacer clic en "ver"
   preguntasPorQuiz: { [quizId: string]: any[] } = {};
@@ -28,6 +30,7 @@ export class QuizCreatePage implements OnInit {
     private router: Router,
     private quizService: QuizService,
     private alertCtrl: AlertController
+
   ) {}
 
   ngOnInit() {
@@ -70,13 +73,15 @@ export class QuizCreatePage implements OnInit {
 
     const quizId = uuidv4();
     const quiz = {
-      id: quizId,
-      titulo: this.titulo,
-      descripcion: this.descripcion,
-      courseId: this.courseId,
-      fechaCierre: this.fechaCierre ? new Date(this.fechaCierre) : new Date(),
-      puntosTotales: this.preguntas.reduce((acc, p) => acc + p.puntaje, 0),
-    };
+  id: quizId,
+  titulo: this.titulo,
+  descripcion: this.descripcion,
+  courseId: this.courseId,
+  fechaInicio: this.fechaInicio ? new Date(this.fechaInicio) : new Date(),
+  fechaCierre: this.fechaCierre ? new Date(this.fechaCierre) : new Date(),
+  intentosPermitidos: this.intentosPermitidos || 1,
+  puntosTotales: this.preguntas.reduce((acc, p) => acc + p.puntaje, 0),
+};
 
     try {
       await this.quizService.createTest(quiz);
@@ -97,6 +102,7 @@ export class QuizCreatePage implements OnInit {
       this.preguntas = [];
       this.agregarPregunta();
       this.cargarQuizzes();
+      await this.cargarQuizzes();
     } catch (error) {
       console.error('Error al guardar el quiz:', error);
       alert('❌ Error al guardar el quiz');
