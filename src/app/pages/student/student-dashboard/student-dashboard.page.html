@@ -28,13 +28,21 @@
   <ion-grid>
     <ion-row>
       <ion-col size="6">
-        <ion-button expand="block" color="secondary" (click)="navigateToCourse()">
+        <ion-button
+          expand="block"
+          color="secondary"
+          (click)="navigateToCourse()"
+        >
           <ion-icon name="book-outline" slot="start"></ion-icon>
           Cursos
         </ion-button>
       </ion-col>
       <ion-col size="6">
-        <ion-button expand="block" color="warning" (click)="navigateTo('/student/task-list')">
+        <ion-button
+          expand="block"
+          color="warning"
+          (click)="navigateTo('/student/task-list')"
+        >
           <ion-icon name="document-text-outline" slot="start"></ion-icon>
           Tareas
         </ion-button>
@@ -48,7 +56,12 @@
         </ion-button>
       </ion-col>
       <ion-col size="6">
-        <ion-button expand="block" color="medium" (click)="navigateTo('/student/recommendations')">
+        <ion-button
+          disabled
+          expand="block"
+          color="medium"
+          (click)="navigateTo('/student/recommendations')"
+        >
           <ion-icon name="bulb-outline" slot="start"></ion-icon>
           Ayuda
         </ion-button>
