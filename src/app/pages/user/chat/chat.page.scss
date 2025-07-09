@@ -5,9 +5,12 @@ ion-content {
 }
 
 .chat-container {
+  flex: 1;
+  overflow-y: auto;
   padding: 10px;
   display: flex;
   flex-direction: column;
+  justify-content: flex-end; /* Esto ayuda a mantener el scroll abajo */
 }
 
 .sent {
@@ -85,6 +88,14 @@ ion-footer {
       margin-right: 8px;
       font-size: 1.2rem;
     }
+  }
+}
+
+.sending {
+  opacity: 0.8;
+
+  .message {
+    background-color: #e0e0e0 !important;
   }
 }
 

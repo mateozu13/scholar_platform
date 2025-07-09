@@ -6,6 +6,7 @@ import { ChatService } from 'src/app/services/chat.service';
 import firebase from 'firebase/compat/app';
 import { UserService } from 'src/app/services/user.service';
 import { Subscription } from 'rxjs';
+import { ToastController } from '@ionic/angular';
 
 @Component({
   selector: 'app-chat-list',
@@ -25,7 +26,8 @@ export class ChatListPage implements OnInit, OnDestroy {
     private chatService: ChatService,
     private userService: UserService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private toastController: ToastController
   ) {
     this.currentUserId = firebase.auth().currentUser?.uid;
     this.courseId = this.route.snapshot.paramMap.get('courseId');
@@ -35,8 +37,31 @@ export class ChatListPage implements OnInit, OnDestroy {
     this.loadChats();
   }
 
+  checkOfflineStatus() {
+    if (!navigator.onLine) {
+      const toast = this.toastController.create({
+        message: 'Estás en modo offline',
+        duration: 3000,
+        position: 'bottom',
+        color: 'warning',
+      });
+      toast.then((t) => t.present());
+    }
+  }
+
   ionViewWillEnter() {
     this.loadChats();
+  }
+
+  ionViewDidEnter() {
+    this.checkOfflineStatus();
+    window.addEventListener('online', this.checkOfflineStatus.bind(this));
+    window.addEventListener('offline', this.checkOfflineStatus.bind(this));
+  }
+
+  ionViewWillLeave() {
+    window.removeEventListener('online', this.checkOfflineStatus.bind(this));
+    window.removeEventListener('offline', this.checkOfflineStatus.bind(this));
   }
 
   ngOnDestroy() {
