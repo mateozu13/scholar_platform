@@ -8,7 +8,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
-import { Platform } from '@ionic/angular';
+import { IonContent, Platform } from '@ionic/angular';
 import { ChatService } from 'src/app/services/chat.service';
 import { Message } from 'src/app/models/chat.model';
 import { OfflineQueueService } from 'src/app/services/offline-queue.service';
@@ -22,7 +22,7 @@ import { Subscription } from 'rxjs';
   standalone: false,
 })
 export class ChatPage implements OnInit, OnDestroy {
-  @ViewChild('content') content: ElementRef;
+  @ViewChild(IonContent, { static: false }) content: IonContent;
 
   chatId: string;
   messages: Message[] = [];
@@ -35,6 +35,7 @@ export class ChatPage implements OnInit, OnDestroy {
   messagesSubscription: Subscription;
   messageSentSubscription: Subscription;
   hasPendingMessages = false;
+  private queueSubscription: Subscription;
 
   constructor(
     private route: ActivatedRoute,
@@ -51,13 +52,19 @@ export class ChatPage implements OnInit, OnDestroy {
     this.courseId = this.router.getCurrentNavigation()?.extras?.state?.courseId;
   }
 
-  ngOnInit() {
-    this.subscribeToMessages();
+  async ngOnInit() {
+    await this.subscribeToMessages();
+
+    this.queueSubscription = this.offlineQueue
+      .getQueueUpdates()
+      .subscribe(() => {
+        this.checkPendingMessages();
+      });
 
     // Suscribirse a nuevos mensajes enviados
     this.messageSentSubscription = this.chatService.messageSent$.subscribe(
       (message) => {
-        if (message && message.chatId === this.chatId) {
+        if (message && message.chatId === this.chatId && navigator.onLine) {
           this.addMessageToView(message);
         }
       }
@@ -65,45 +72,68 @@ export class ChatPage implements OnInit, OnDestroy {
   }
 
   addMessageToView(message: Message) {
-    // Función para convertir Firestore timestamp a Date
-    const convertFirestoreTimestampToDate = (timestamp: {
-      seconds: number;
-      nanoseconds: number;
-    }): Date => {
-      return new Date(
-        timestamp.seconds * 1000 + Math.floor(timestamp.nanoseconds / 1000000)
-      );
-    };
-    // Convertir el timestamp de message a Date
-    const messageDate = convertFirestoreTimestampToDate(message.timestamp);
-    // Verificar si el mensaje ya existe en la vista
+    const messageDate = new Date(message.timestamp);
     const exists = this.messages.some((m) => {
       // Comparar m.timestamp (Date) con messageDate (Date)
       return (
-        m.timestamp.getTime() === messageDate.getTime() &&
+        new Date(m.timestamp).getTime() === new Date(messageDate).getTime() &&
         m.text === message.text &&
         m.senderId === message.senderId
       );
     });
     if (!exists) {
       this.messages.push(message);
-      this.scrollToBottom();
     }
+    this.scrollToBottom();
   }
 
   subscribeToMessages() {
+    if (this.messagesSubscription) {
+      this.messagesSubscription.unsubscribe();
+    }
+
     this.messagesSubscription = this.messageService
       .getMessagesWithOffline(this.chatId)
-      .subscribe((messages) => {
-        this.messages = messages;
-        this.isLoading = false;
+      .subscribe({
+        next: (messages) => {
+          this.messages = this.removeDuplicates(messages);
+          this.isLoading = false;
 
-        if (this.isActive) {
-          this.markMessagesAsRead();
-        }
+          if (this.isActive) {
+            this.markMessagesAsRead();
+          }
 
-        this.scrollToBottom();
+          this.scrollToBottom(true);
+        },
+        error: (err) => {
+          console.error('Error loading messages:', err);
+          this.isLoading = false;
+        },
       });
+  }
+  private removeDuplicates(messages: Message[]): Message[] {
+    const uniqueMessages: Message[] = [];
+    const seenIds = new Set<string>();
+    const seenOfflineKeys = new Set<string>();
+
+    messages.forEach((msg) => {
+      if (msg.id && !msg.offline && !seenIds.has(msg.id)) {
+        seenIds.add(msg.id);
+        uniqueMessages.push(msg);
+      } else if (msg.offline) {
+        const offlineKey = `${msg.text}_${
+          msg.senderId
+        }_${msg.timestamp.getTime()}`;
+        if (!seenOfflineKeys.has(offlineKey)) {
+          seenOfflineKeys.add(offlineKey);
+          uniqueMessages.push(msg);
+        }
+      }
+    });
+
+    return uniqueMessages.sort(
+      (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
+    );
   }
 
   async sendMessage() {
@@ -126,11 +156,15 @@ export class ChatPage implements OnInit, OnDestroy {
 
   checkPendingMessages() {
     this.hasPendingMessages = this.offlineQueue.hasPendingMessages();
+    if (!this.hasPendingMessages && navigator.onLine) {
+      this.subscribeToMessages();
+    }
   }
 
   ionViewDidEnter() {
     this.isActive = true;
     this.markMessagesAsRead();
+    this.scrollToBottom(true);
   }
 
   ionViewWillLeave() {
@@ -145,13 +179,24 @@ export class ChatPage implements OnInit, OnDestroy {
     if (this.messageSentSubscription) {
       this.messageSentSubscription.unsubscribe();
     }
+    if (this.queueSubscription) this.queueSubscription.unsubscribe();
   }
 
-  scrollToBottom() {
-    try {
-      this.content.nativeElement.scrollTop =
-        this.content.nativeElement.scrollHeight;
-    } catch (err) {}
+  private async scrollToBottom(instant: boolean = false) {
+    setTimeout(async () => {
+      if (!this.content) return;
+      try {
+        if (instant) {
+          // sin animación
+          await this.content.scrollToBottom(0);
+        } else {
+          // con animación de 300ms
+          await this.content.scrollToBottom(300);
+        }
+      } catch (err) {
+        console.error('Error scrolling:', err);
+      }
+    }, 100);
   }
 
   getMessageStatusIcon(status: string): string {

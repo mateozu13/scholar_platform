@@ -15,6 +15,7 @@ export class ChatService {
   private db = firebase.firestore();
   private messageSentSource = new BehaviorSubject<Message | null>(null);
   messageSent$ = this.messageSentSource.asObservable();
+  private isProcessingQueue = false;
 
   constructor(
     private offlineQueue: OfflineQueueService,
@@ -74,24 +75,30 @@ export class ChatService {
     userId2: string,
     courseId?: string
   ): Promise<string> {
-    // Normaliza los participantes para crear un ID de chat consistente
+    // Ordenar los IDs para garantizar consistencia
     const participants = [userId1, userId2].sort();
     const chatId = participants.join('_');
 
     const chatRef = this.db.collection('chats').doc(chatId);
-    const chatDoc = await chatRef.get(); // get() devuelve una promesa directamente en el SDK nativo
 
-    // Si el chat no existe, créalo
-    if (!chatDoc.exists) {
-      await chatRef.set({
-        participants,
-        lastMessage: '',
-        lastMessageTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
-        ...(courseId && { courseId }), // Añade courseId si está presente
-      });
+    try {
+      const chatDoc = await chatRef.get();
+
+      if (!chatDoc.exists) {
+        await chatRef.set({
+          participants,
+          lastMessage: '',
+          lastMessageTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+          ...(courseId && { courseId }),
+        });
+      }
+
+      return chatId;
+    } catch (error) {
+      console.error('Error creating/accessing chat:', error);
+      throw error;
     }
-
-    return chatId;
   }
 
   /**
@@ -195,7 +202,6 @@ export class ChatService {
     const messageText = text.trim();
     if (!messageText) return;
 
-    // Crear objeto de mensaje
     const newMessage: Message = {
       chatId,
       senderId,
@@ -204,71 +210,134 @@ export class ChatService {
       status: 'sent',
     };
 
-    // Verificar conexión
     if (!navigator.onLine) {
       newMessage.status = 'queued';
+      newMessage.localTimestamp = new Date(); // Guardar timestamp local
       await this.offlineQueue.addMessageToQueue(newMessage);
-      this.messageSentSource.next(newMessage); // Notificar a los componentes
+      this.messageSentSource.next(newMessage);
       return;
     }
 
     try {
       await this.sendToFirestore(chatId, newMessage);
-      this.messageSentSource.next(newMessage); // Notificar a los componentes
+      this.messageSentSource.next(newMessage);
     } catch (error) {
-      if (error.code === 'unavailable' || error.message.includes('network')) {
-        newMessage.status = 'queued';
-        await this.offlineQueue.addMessageToQueue(newMessage);
-        this.messageSentSource.next(newMessage); // Notificar a los componentes
-      }
+      newMessage.status = 'queued';
+      newMessage.localTimestamp = new Date();
+      await this.offlineQueue.addMessageToQueue(newMessage);
+      this.messageSentSource.next(newMessage);
     }
   }
 
-  // Enviar mensaje a Firestore
   private async sendToFirestore(
     chatId: string,
     message: Message
   ): Promise<void> {
-    // Añadir el mensaje a la subcolección
-    const docRef = await this.db
-      .collection(`chats/${chatId}/messages`)
-      .add(message);
-
-    // Actualizar el documento del chat con el último mensaje
-    await this.db.collection('chats').doc(chatId).update({
-      lastMessage: message.text,
-      lastMessageTimestamp: message.timestamp,
-    });
-
-    // Actualizar el ID del mensaje
-    message.id = docRef.id;
-  }
-
-  // Procesar cola cuando hay conexión
-  async processQueue(): Promise<void> {
-    const queue = this.offlineQueue.getQueue();
-    if (queue.length === 0) return;
-
     try {
-      // Enviar todos los mensajes en orden
-      let message: any;
-      for (message of queue) {
-        await this.sendToFirestore(message.chatId, message.text);
+      // 1. Actualizar estado a "enviando" antes de intentar
+      this.messageSentSource.next({
+        ...message,
+        status: 'sending',
+        offline: false,
+      });
+
+      // 1. Primero verificar si el chat existe
+      const chatRef = this.db.collection('chats').doc(chatId);
+      const chatDoc = await chatRef.get();
+
+      // Si el chat no existe, crearlo primero
+      if (!chatDoc.exists) {
+        const participants = chatId.split('_'); // Asumiendo que el ID del chat es user1_user2
+        await chatRef.set({
+          participants,
+          lastMessage: '',
+          lastMessageTimestamp: firebase.firestore.FieldValue.serverTimestamp(),
+          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+        });
       }
 
-      // Limpiar cola después de enviar
-      this.offlineQueue.removeMessages(message.chatId);
+      // 2. Añadir el mensaje
+      try {
+        message.localTimestamp = this.convertToDate(
+          message.localTimestamp ?? new Date()
+        );
 
-      // Mostrar notificación de éxito
-      const toast = await this.toastController.create({
-        message: `Se enviaron ${queue.length} mensajes pendientes`,
-        duration: 5000,
-        position: 'bottom',
-        color: 'success',
+        message.timestamp = new Date();
+      } catch (error) {}
+
+      const docRef = await this.db
+        .collection(`chats/${chatId}/messages`)
+        .add(message);
+
+      // 3. Actualizar el documento del chat con el último mensaje
+      await chatRef.update({
+        lastMessage: message.text,
+        lastMessageTimestamp: this.convertToDate(message.timestamp),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
       });
-      toast.present();
+
+      message.id = docRef.id;
     } catch (error) {
-      console.error('Error al procesar cola de mensajes:', error);
+      console.error('Error in sendToFirestore:', error);
+      throw error; // Re-lanzar el error para manejarlo en el llamador
     }
+  }
+
+  async processQueue(): Promise<void> {
+    if (this.isProcessingQueue) return;
+    this.isProcessingQueue = true;
+
+    const queue = this.offlineQueue.getQueue();
+    if (queue.length === 0) {
+      this.isProcessingQueue = false;
+      return;
+    }
+
+    const toast = await this.toastController.create({
+      message: 'Enviando mensajes pendientes...',
+      duration: 3000,
+      position: 'bottom',
+    });
+    await toast.present();
+
+    let successCount = 0;
+    let errorCount = 0;
+
+    for (const message of [...queue]) {
+      try {
+        await this.sendToFirestore(message.chatId, message);
+        this.offlineQueue.removeMessageFromQueue(message);
+        successCount++;
+      } catch (error) {
+        console.error('Error sending queued message:', error);
+        errorCount++;
+
+        // Si el error es grave (no es de red), quitamos el mensaje de la cola
+        if (
+          error.code !== 'unavailable' &&
+          !error.message.includes('network')
+        ) {
+          this.offlineQueue.removeMessageFromQueue(message);
+        }
+      }
+    }
+
+    this.isProcessingQueue = false;
+
+    // Mostrar resumen al usuario
+    const resultToast = await this.toastController.create({
+      message: `Mensajes pendientes: ${successCount} enviados, ${errorCount} fallidos`,
+      duration: 5000,
+      position: 'bottom',
+      color: successCount > 0 ? 'success' : 'warning',
+    });
+    await resultToast.present();
+  }
+
+  private convertToDate(timestamp: any): Date {
+    if (timestamp instanceof Date) return timestamp;
+    if (timestamp?.toDate) return timestamp.toDate();
+    if (timestamp?.seconds) return new Date(timestamp.seconds * 1000);
+    return new Date(timestamp);
   }
 }

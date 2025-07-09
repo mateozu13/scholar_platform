@@ -13,7 +13,8 @@ export interface Message {
   senderId: string;
   text: string;
   timestamp: any;
-  status?: 'sent' | 'delivered' | 'read' | 'queued';
+  localTimestamp?: Date;
+  status?: 'sent' | 'delivered' | 'read' | 'queued' | any;
   readAt?: firebase.firestore.Timestamp;
   offline?: boolean;
 }

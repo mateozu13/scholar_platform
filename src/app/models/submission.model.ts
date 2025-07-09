@@ -1,5 +1,3 @@
-
-
 export interface Submission {
   id: string;
   assignmentId: string;
@@ -9,4 +7,5 @@ export interface Submission {
   calificacion?: number;
   retroalimentacion?: string;
   courseId?: string;
+  late?: boolean;
 }

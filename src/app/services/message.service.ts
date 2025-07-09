@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/firestore';
-import { from, Observable } from 'rxjs';
+import { from, Observable, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Message } from '../models/chat.model';
 import { OfflineQueueService } from './offline-queue.service';
@@ -12,111 +12,75 @@ import { OfflineQueueService } from './offline-queue.service';
 export class MessageService {
   constructor(private offlineQueue: OfflineQueueService) {}
 
-  // Obtener mensajes de un chat incluyendo los pendientes offline
   getMessagesWithOffline(chatId: string): Observable<Message[]> {
-    return from(
-      firebase
+    const firestoreMessages$ = new Observable<Message[]>((observer) => {
+      const unsubscribe = firebase
         .firestore()
         .collection(`chats/${chatId}/messages`)
         .orderBy('timestamp', 'asc')
-        .get()
-    ).pipe(
-      map((snapshot) => {
-        // 1) Mensajes de Firestore
-        const firestoreMessages: any[] = snapshot.docs.map((doc) => {
-          const data = doc.data() as Message;
-          // Firestore Timestamp -> Date
-          const ts = data.timestamp;
-          const date: Date =
-            typeof ts === 'object' && ts !== null && 'toDate' in ts
-              ? ts.toDate()
-              : new Date(ts);
-          return {
-            id: doc.id,
-            text: data.text,
-            senderId: data.senderId,
-            timestamp: date,
-          };
-        });
+        .onSnapshot(
+          (snapshot) => {
+            const messages = snapshot.docs.map((doc) => {
+              const data = doc.data() as Message;
+              return {
+                id: doc.id,
+                ...data,
+                timestamp: this.convertToDate(data.timestamp),
+                offline: false,
+              };
+            });
+            observer.next(messages);
+          },
+          (error) => observer.error(error)
+        );
 
-        // 2) Mensajes encolados offline
-        const offlineMessages: any[] = this.offlineQueue
-          .getQueue()
-          .filter((item) => item.chatId === chatId)
-          .map((item) => {
-            const msg = item;
-            // msg.timestamp es number si viene de Date.now()
-            const date: Date =
-              typeof msg.timestamp === 'number'
-                ? new Date(msg.timestamp)
-                : // por si acaso viene Timestamp
-                (msg.timestamp as any).toDate
-                ? (msg.timestamp as any).toDate()
-                : new Date(msg.timestamp);
-            return {
-              text: msg.text,
-              senderId: msg.senderId,
-              timestamp: date,
-              offline: true,
-            };
-          });
+      return () => unsubscribe();
+    });
 
-        // 3) Fusionar y ordenar
-        const all = [...firestoreMessages, ...offlineMessages];
-        return all.sort(
-          (a, b) => a.timestamp.getTime() - b.timestamp.getTime()
+    const offlineMessages$ = this.offlineQueue.getQueueUpdates().pipe(
+      map((queue) =>
+        queue
+          .filter((msg) => msg.chatId === chatId)
+          .map((msg) => ({
+            ...msg,
+            id: `offline_${new Date(
+              this.convertToDate(msg.localTimestamp) ?? new Date()
+            ).getTime()}`,
+            offline: true,
+            timestamp: this.convertToDate(msg.localTimestamp) ?? new Date(),
+          }))
+      )
+    );
+
+    return combineLatest([firestoreMessages$, offlineMessages$]).pipe(
+      map(([firestore, offline]) => {
+        // Filtrar mensajes offline que ya están en Firestore
+        const uniqueOffline = offline.filter(
+          (offMsg) =>
+            !firestore.some(
+              (fsMsg) =>
+                fsMsg.text === offMsg.text &&
+                fsMsg.senderId === offMsg.senderId &&
+                Math.abs(
+                  this.convertToDate(fsMsg.timestamp).getTime() -
+                    this.convertToDate(offMsg.timestamp).getTime()
+                ) < 30000
+            )
+        );
+
+        return [...firestore, ...uniqueOffline].sort(
+          (a, b) =>
+            this.convertToDate(a.timestamp).getTime() -
+            this.convertToDate(b.timestamp).getTime()
         );
       })
     );
   }
 
-  // Obtener conteo diario de mensajes (para dashboard)
-  getDailyMessageCounts(days: number): Observable<number[]> {
-    const today = new Date();
-    const startDate = new Date(today);
-    startDate.setDate(today.getDate() - days + 1);
-    startDate.setHours(0, 0, 0, 0);
-
-    return from(
-      firebase
-        .firestore()
-        .collectionGroup('messages')
-        .where(
-          'timestamp',
-          '>=',
-          firebase.firestore.Timestamp.fromDate(startDate)
-        )
-        .get()
-    ).pipe(
-      map((snapshot) => {
-        const counts = new Array(days).fill(0);
-        snapshot.docs.forEach((doc) => {
-          const message = doc.data() as any;
-          const date = message.timestamp.toDate();
-          const dayIndex = Math.floor(
-            (date.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)
-          );
-          if (dayIndex >= 0 && dayIndex < days) {
-            counts[dayIndex]++;
-          }
-        });
-        return counts;
-      })
-    );
-  }
-
   private convertToDate(timestamp: any): Date {
-    if (timestamp instanceof Date) {
-      return timestamp;
-    } else if (timestamp instanceof firebase.firestore.Timestamp) {
-      return timestamp.toDate();
-    } else if (timestamp?.toDate) {
-      return timestamp.toDate();
-    } else if (timestamp?.seconds) {
-      return new Date(timestamp.seconds * 1000);
-    } else if (timestamp) {
-      return new Date(timestamp);
-    }
-    return new Date();
+    if (timestamp instanceof Date) return timestamp;
+    if (timestamp?.toDate) return timestamp.toDate();
+    if (timestamp?.seconds) return new Date(timestamp.seconds * 1000);
+    return new Date(timestamp);
   }
 }

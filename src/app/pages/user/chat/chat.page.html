@@ -7,7 +7,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content (ionScroll)="scrollToBottom()" #content>
+<ion-content #content>
   <!-- Indicador de mensajes pendientes -->
   <div *ngIf="hasPendingMessages" class="offline-indicator">
     <ion-icon name="cloud-offline"></ion-icon>
@@ -17,9 +17,9 @@
   <div class="chat-container">
     <div
       *ngFor="let message of messages"
+      [class.offline]="message.offline"
       [class.sent]="message.senderId === currentUserId"
       [class.received]="message.senderId !== currentUserId"
-      [class.offline]="message.offline"
     >
       <div class="message">
         <p>{{ message.text }}</p>
