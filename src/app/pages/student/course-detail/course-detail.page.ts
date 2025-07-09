@@ -5,6 +5,15 @@ import { Course } from '../../../models/course.model';
 import { User } from '../../../models/user.model';
 import { UserService } from '../../../services/user.service';
 import { AlertController, LoadingController } from '@ionic/angular';
+import { AuthService } from 'src/app/services/auth.service';
+import { CourseMaterial } from 'src/app/models/course-material.model';
+import { TaskService } from 'src/app/services/task.service';
+import { QuizService } from 'src/app/services/quiz.service';
+import firebase from 'firebase/compat/app';
+import { Assignment } from 'src/app/models/assignment.model';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+
+
 
 @Component({
   selector: 'app-course-detail',
@@ -17,6 +26,17 @@ export class CourseDetailPage implements OnInit {
   course: Course | null = null;
   profesor: User | null = null;
   isLoading = false;
+  showVideos = false;
+  showForums = false;
+
+
+  showMaterials = false;
+  showTasks = false;
+  materiales: CourseMaterial[] = [];
+  tareas: Assignment[] = [];
+  isPreviewOpen = false;
+  sanitizedPreviewUrl: SafeResourceUrl | null = null;
+
 
   constructor(
     private route: ActivatedRoute,
@@ -24,8 +44,12 @@ export class CourseDetailPage implements OnInit {
     private userService: UserService,
     private loadingCtrl: LoadingController,
     private alertCtrl: AlertController,
-    private router: Router
-  ) {}
+    private router: Router,
+    private authService: AuthService,
+    private taskService: TaskService,
+    private quizService: QuizService,
+    private sanitizer: DomSanitizer
+  ) { }
 
   async ngOnInit() {
     this.courseId = this.route.snapshot.paramMap.get('courseId') || '';
@@ -61,33 +85,87 @@ export class CourseDetailPage implements OnInit {
       await loading.dismiss();
     }
   }
-  navigateTo(section: string) {
-    const courseId = this.course?.id;
-    if (!courseId) return;
 
-    switch (section) {
-      case 'materials':
-        this.router.navigate(['/student/materials', courseId]);
-        break;
-      case 'tareas':
-        this.router.navigate(['/student/task-list']);
-        break;
-      case 'quizzes':
-        this.router.navigate(['/student/course-quizzes', courseId]);
-        break;
-      case 'forums':
-        this.router.navigate(['/student/forums', courseId]);
-        break;
-      case 'grades':
-        this.router.navigate(['/student/grades', courseId]);
-        break;
-      case 'calendar':
-        this.router.navigate(['/student/calendar', courseId]);
-        break;
+  async loadMaterials() {
+    const snapshot = await firebase
+      .firestore()
+      .collection('courses')
+      .doc(this.courseId)
+      .collection('materiales')
+      .orderBy('fechaSubida', 'desc')
+      .get();
+
+    this.materiales = snapshot.docs.map((doc) => {
+      const data = doc.data();
+      return {
+        id: doc.id,
+        courseId: this.courseId,
+        titulo: data.titulo,
+        urlArchivo: data.url || 'Archivo Dañado',
+        tipo: data.tipo,
+        fechaPublicacion: data.fechaSubida?.toDate?.() || new Date(),
+        publicadoPor: data.publicadoPor || '',
+      } as CourseMaterial;
+    });
+  }
+
+  async loadTasks() {
+    this.tareas = await this.taskService.getAssignmentsByCourse(this.courseId);
+  }
+
+  async toggleMaterials() {
+    this.showMaterials = !this.showMaterials;
+    if (this.showMaterials && this.materiales.length === 0) {
+      await this.loadMaterials();
     }
+  }
+
+  toggleVideos() {
+    this.showVideos = !this.showVideos;
+  }
+
+  toggleForums() {
+    this.showForums = !this.showForums;
+  }
+
+  async toggleTasks() {
+    this.showTasks = !this.showTasks;
+    if (this.showTasks && this.tareas.length === 0) {
+      await this.loadTasks();
+    }
+  }
+
+
+  viewTask(taskId: string) {
+    this.router.navigate(['/student/task-detail', taskId]);
+  }
+
+  viewQuiz(quizId: string) {
+    this.router.navigate(['/student/quiz-detail', quizId]);
   }
 
   openChatList() {
     this.router.navigate(['/student/course', this.courseId, 'chats']);
+  }
+
+  async logout() {
+    const alert = await this.alertCtrl.create({
+      header: 'Cerrar sesión',
+      message: '¿Estás seguro de que quieres cerrar sesión?',
+      buttons: [
+        { text: 'Cancelar', role: 'cancel' },
+        {
+          text: 'Cerrar sesión',
+          handler: async () => {
+            await this.authService.logout();
+          },
+        },
+      ],
+    });
+    await alert.present();
+  }
+
+  navigateToProfile() {
+    this.router.navigate(['/student/profile']);
   }
 }

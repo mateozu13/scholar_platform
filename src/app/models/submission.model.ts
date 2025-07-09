@@ -8,4 +8,5 @@ export interface Submission {
   fechaEnvio: Date;
   calificacion?: number;
   retroalimentacion?: string;
+  courseId?: string;
 }

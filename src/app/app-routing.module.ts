@@ -184,10 +184,6 @@ const routes: Routes = [
         loadChildren: () =>
           import('./pages/user/chat/chat.module').then((m) => m.ChatPageModule),
       },
-      {
-        path: 'material-course',
-        loadChildren: () => import('./pages/student/material-course/material-course.module').then(m => m.MaterialCoursePageModule)
-      },
     ],
   },
 

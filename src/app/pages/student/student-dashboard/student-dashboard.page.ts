@@ -8,6 +8,7 @@ import { Course } from '../../../models/course.model';
 import { Assignment } from '../../../models/assignment.model';
 import { AlertController, LoadingController } from '@ionic/angular';
 import { Chart, registerables } from 'chart.js';
+import { Submission } from 'src/app/models/submission.model';
 
 @Component({
   selector: 'app-student-dashboard',
@@ -20,6 +21,8 @@ export class StudentDashboardPage implements OnInit {
   enrolledCourses: Course[] = [];
   pendingAssignments: Assignment[] = [];
   upcomingDeadlines: Assignment[] = [];
+  completedAssignments: Assignment[] = [];
+  expiredAssignments: Assignment[] = [];
   progressChart: any;
   statusChart: any;
   isLoading = false;
@@ -50,6 +53,11 @@ export class StudentDashboardPage implements OnInit {
     });
     await loading.present();
 
+
+
+
+
+    
     try {
       this.currentUser = await this.authService.getCurrentUser();
 
@@ -57,6 +65,32 @@ export class StudentDashboardPage implements OnInit {
         this.enrolledCourses = await this.courseService.getCoursesByStudent(this.currentUser.id);
         this.pendingAssignments = await this.taskService.getPendingAssignments(this.currentUser.id);
         this.upcomingDeadlines = await this.taskService.getUpcomingAssignments(this.currentUser.id);
+
+        const allSubmissions = await this.taskService.getSubmissionsByStudent(this.currentUser.id);
+
+        this.completedAssignments = allSubmissions.map((s: Submission) => {
+          return {
+            id: s.assignmentId,
+            titulo: 'Tarea entregada',
+            descripcion: '',
+            fechaEntrega: s.fechaEnvio,
+            courseId: s.courseId
+          } as Assignment;
+        });
+
+        const allAssignments: Assignment[] = [];
+        for (const course of this.enrolledCourses) {
+          const courseAssignments = await this.taskService.getAssignmentsByCourse(course.id);
+          allAssignments.push(...courseAssignments);
+        }
+
+        const now = new Date();
+        this.expiredAssignments = allAssignments.filter(
+          a =>
+            new Date(a.fechaEntrega) < now &&
+            !this.completedAssignments.find(c => c.id === a.id)
+        );
+
         this.createProgressChart();
         this.createStatusChart();
       }
@@ -74,7 +108,7 @@ export class StudentDashboardPage implements OnInit {
     }
   }
 
-  createProgressChart() {
+createProgressChart() {
     if (this.progressChart) this.progressChart.destroy();
 
     const ctx = document.getElementById('progressChart') as HTMLCanvasElement;
@@ -114,10 +148,14 @@ export class StudentDashboardPage implements OnInit {
     this.statusChart = new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: ['Pendientes', 'Completadas', 'Vencidas'],
+        labels: ['Pendientes', 'Completadas'],
         datasets: [
           {
-            data: [this.pendingAssignments.length, 3, 2], // Simulación
+            data: [
+              this.pendingAssignments.length,
+              this.completedAssignments.length,
+              //this.expiredAssignments.length,
+            ],
             backgroundColor: ['#FFA500', '#28a745', '#dc3545'],
             borderWidth: 1,
           },
@@ -137,19 +175,18 @@ export class StudentDashboardPage implements OnInit {
   navigateToProfile() {
     this.router.navigate(['/student/profile']);
   }
-  
+
   navigateToCourse() {
     this.router.navigate(['/student/courses-list']);
   }
 
-  navigateToQuiz(){
-        this.router.navigate(['/student/quiz-list']);
+  navigateToQuiz() {
+    this.router.navigate(['/student/quiz-list']);
   }
+
   navigateTo(route: string) {
     this.router.navigate([route]);
   }
-
-  
 
   async logout() {
     const alert = await this.alertCtrl.create({
